@@ -36,6 +36,9 @@ const simulationsList = simulations.map((sim) => (
 
 export const DashboardPage = () => (
   <div className="container my-4">
+    <ol className="breadcrumb">
+      <li className="breadcrumb-item active">Dashboard</li>
+    </ol>
     <h1 className="text-center mb-4">Simulation Files</h1>
     <div className="input-group mx-auto mb-4 w-50">
       <input type="text" className="form-control" placeholder="Search..." />

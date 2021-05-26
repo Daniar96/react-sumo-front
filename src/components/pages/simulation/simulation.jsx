@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { SylvereyeRoadNetwork } from "../../../lib/dash_sylvereye.react.min.js";
+import HighchartsReact from "highcharts-react-official";
+import Highcharts from "highcharts";
+import { Link } from "react-router-dom";
 
 export const SimulationPage = ({ match }) => {
   const map_center = [60.1663, 24.9313];
   const map_zoom = 15;
-  const map_style = { width: "100%", height: "100vh" };
+  const map_style = { width: "100%", height: "75vh" };
   const tile_layer_url =
     "//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
   const tile_layer_subdomains = "abcd";
@@ -15,6 +18,12 @@ export const SimulationPage = ({ match }) => {
 
   return (
     <div className="container my-4">
+      <ol className="breadcrumb">
+        <li className="breadcrumb-item">
+          <Link to="/dashboard">Dashboard</Link>
+        </li>
+        <li className="breadcrumb-item active">Simulation {match.params.id}</li>
+      </ol>
       <h1 className="text-center mb-4">Simulation {match.params.id}</h1>
       <div className="mb-4">
         <SylvereyeRoadNetwork
@@ -32,13 +41,46 @@ export const SimulationPage = ({ match }) => {
       </div>
       <div className="row mb-4 gap-4 w-100 mx-auto">
         <div className="col card">
-          a<br />1 a<br />1
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={{
+              title: { text: "Average turns taken by each car" },
+              series: [
+                {
+                  data: [8, 4, 2, 1, 2, 4, 8, 16],
+                },
+                {
+                  data: [1, 1, 2, 3, 5, 8, 13, 21],
+                },
+              ],
+            }}
+          />
         </div>
         <div className="col card">
-          b<br />1 b<br />1
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={{
+              title: { text: "Number of vehicles on the road" },
+              series: [
+                {
+                  data: [58, 3254, 23, 532, 6135],
+                },
+              ],
+            }}
+          />
         </div>
         <div className="col card">
-          c<br />1 c<br />1
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={{
+              title: { text: "Something" },
+              series: [
+                {
+                  data: [1, 1, 2, 3, 5, 8, 13, 21],
+                },
+              ],
+            }}
+          />
         </div>
       </div>
       <div>
