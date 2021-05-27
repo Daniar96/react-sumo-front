@@ -83,7 +83,7 @@ export const SimulationPage = ({ match }) => {
           />
         </div>
       </div>
-      <div>
+      <div className="mb-4">
         <div>
           <b>Date: </b>April 10, 2020
         </div>
@@ -99,6 +99,11 @@ export const SimulationPage = ({ match }) => {
         <div>
           <b>Extra: </b>a b c
         </div>
+      </div>
+      <div className="btn-group">
+        <button className="btn btn-outline-secondary">Edit</button>
+        <button className="btn btn-outline-primary">Download</button>
+        <button className="btn btn-outline-danger">Delete</button>
       </div>
     </div>
   );

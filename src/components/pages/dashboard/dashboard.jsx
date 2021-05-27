@@ -46,13 +46,14 @@ export const DashboardPage = () => {
         <li className="breadcrumb-item active">Dashboard</li>
       </ol>
       <h1 className="text-center mb-4">Simulation Files</h1>
-      <div className="input-group mx-auto mb-4 w-50">
+      <div className="d-flex gap-4 mb-4">
         <input
           type="text"
           className="form-control"
           placeholder="Search..."
           onChange={(event) => setSearch(event.target.value)}
         />
+        <button className="btn btn-outline-primary">Upload</button>
       </div>
       <div className="list-group">{simulationsList}</div>
     </div>
