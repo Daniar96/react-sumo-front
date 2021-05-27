@@ -25,7 +25,7 @@ export const SimulationPage = ({ match }) => {
         <li className="breadcrumb-item active">Simulation {match.params.id}</li>
       </ol>
       <h1 className="text-center mb-4">Simulation {match.params.id}</h1>
-      <div className="mb-4">
+      <div className="mb-4 card">
         <SylvereyeRoadNetwork
           setProps={setProps}
           edges_data={[]}
