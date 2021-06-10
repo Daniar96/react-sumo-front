@@ -1,20 +1,88 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SylvereyeRoadNetwork } from "../../../lib/dash_sylvereye.react.min.js";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { Link } from "react-router-dom";
 
+const map_center = [60.1663, 24.9313];
+const map_zoom = 15;
+const map_style = { width: "100%", height: "75vh" };
+const tile_layer_url =
+  "//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
+const tile_layer_subdomains = "abcd";
+const tile_layer_attribution =
+  "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://www.openstreetmap.org/copyright'>ODbL</a>.";
+const tile_layer_opacity = 0.2;
+
 export const SimulationPage = ({ match }) => {
-  const map_center = [60.1663, 24.9313];
-  const map_zoom = 15;
-  const map_style = { width: "100%", height: "75vh" };
-  const tile_layer_url =
-    "//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
-  const tile_layer_subdomains = "abcd";
-  const tile_layer_attribution =
-    "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://www.openstreetmap.org/copyright'>ODbL</a>.";
-  const tile_layer_opacity = 0.2;
-  const [props, setProps] = useState({});
+  const [_props, setProps] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [metadata, setMetadata] = useState({});
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+
+  useEffect(async () => {
+    setLoading(true);
+
+    setMetadata(
+      await (
+        await fetch(
+          `http://localhost:8080/project_war/simulations/${match.params.id}/metadata`
+        )
+      ).json()
+    );
+
+    setNodes(
+      (
+        await (
+          await fetch(
+            `http://localhost:8080/project_war/simulations/${match.params.id}/nodes`
+          )
+        ).json()
+      ).map((node) => ({
+        lon: node.lon,
+        lat: node.lat,
+        visible: true,
+        alpha: 1.0,
+        size: 0.005,
+        color: 10551296,
+        data: {
+          id: node.id,
+        },
+      }))
+    );
+
+    setEdges(
+      (
+        await (
+          await fetch(
+            `http://localhost:8080/project_war/simulations/${match.params.id}/edges`
+          )
+        ).json()
+      )
+        .filter((edge) => edge.geometry !== null)
+        .map((edge) => ({
+          coords: edge.geometry.map((coord) =>
+            coord.split(",").map(parseFloat).reverse()
+          ),
+          visible: true,
+          alpha: 1.0,
+          width: 0.25,
+          color: 26262,
+          data: {
+            id: edge.id,
+            start: edge.start,
+            finish: edge.finish,
+          },
+        }))
+    );
+
+    setLoading(false);
+  }, [match.params.id]);
+
+  if (loading) {
+    return <div />;
+  }
 
   return (
     <div className="container my-4">
@@ -22,15 +90,15 @@ export const SimulationPage = ({ match }) => {
         <li className="breadcrumb-item">
           <Link to="/dashboard">Dashboard</Link>
         </li>
-        <li className="breadcrumb-item active">Simulation {match.params.id}</li>
+        <li className="breadcrumb-item active">{metadata.name}</li>
       </ol>
-      <h1 className="text-center mb-4">Simulation {match.params.id}</h1>
+      <h1 className="text-center mb-4">{metadata.name}</h1>
       <div className="mb-4 card">
         <SylvereyeRoadNetwork
           setProps={setProps}
-          edges_data={[]}
-          nodes_data={[]}
-          map_center={map_center}
+          edges_data={edges}
+          nodes_data={nodes}
+          map_center={[edges[50].coords[0][0], edges[50].coords[0][1]]}
           map_zoom={map_zoom}
           map_style={map_style}
           tile_layer_url={tile_layer_url}
@@ -85,19 +153,12 @@ export const SimulationPage = ({ match }) => {
       </div>
       <div className="mb-4">
         <div>
-          <b>Date: </b>April 10, 2020
+          <b>Date: </b>
+          {metadata.date}
         </div>
         <div>
-          <b>Tags: </b>tag1 tag2 tag3
-        </div>
-        <div>
-          <b>Location: </b>Helsinki, Finland
-        </div>
-        <div>
-          <b>Time: </b>00:00 UTC
-        </div>
-        <div>
-          <b>Extra: </b>a b c
+          <b>Description: </b>
+          {metadata.description}
         </div>
       </div>
       <div className="btn-group">

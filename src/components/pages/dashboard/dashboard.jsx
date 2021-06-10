@@ -1,29 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-const simulations = [
-  {
-    id: "1",
-    name: "This is Simulation 1",
-    date: "April 10, 2020",
-    location: "Helsinki, Finland",
-  },
-  {
-    id: "2",
-    name: "The Simulation 2",
-    date: "April 11, 2020",
-    location: "Helsinki, Finland",
-  },
-  {
-    id: "3",
-    name: "A Simulation 3",
-    date: "April 12, 2020",
-    location: "Helsinki, Finland",
-  },
-];
 
 export const DashboardPage = () => {
   const [search, setSearch] = useState("");
+  const [simulations, setSimulations] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/project_war/simulations")
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json);
+
+        setSimulations([
+          ...simulations,
+          ...json.map((simulation) => ({
+            id: simulation.id,
+            name: simulation.name,
+            date: simulation.date,
+            description: simulation.description,
+          })),
+        ]);
+      });
+  }, []);
 
   const simulationsList = simulations
     .filter((sim) => sim.name.toLowerCase().includes(search.toLowerCase()))
@@ -35,7 +33,7 @@ export const DashboardPage = () => {
       >
         <div className="ms-2 me-auto">
           <div className="fw-bold">{sim.name}</div>
-          {sim.date} - {sim.location}
+          {sim.date} - {sim.description}
         </div>
       </Link>
     ));
