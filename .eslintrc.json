@@ -1,5 +1,13 @@
 {
-    "env": {
-        "amd": true
+  "env": {
+    "amd": true
+  },
+  "plugins": ["react"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2020,
+    "ecmaFeatures": {
+      "jsx": true
     }
+  }
 }
