@@ -1,5 +1,5 @@
 import './App.css'
-import {BrowserRouter, Switch, Route} from "react-router-dom"
+import {BrowserRouter, Switch, Route} from './contexts/routerContext'
 
 import Footer from "./components/footer"
 import Header from "./components/header"

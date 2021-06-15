@@ -2,7 +2,7 @@ import { useState } from "react";
 import { SylvereyeRoadNetwork } from "../../../lib/dash_sylvereye.react.min.js";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import { Link } from "react-router-dom";
+import { Link } from '../../link'
 
 export const SimulationPage = ({ match }) => {
   const map_center = [60.1663, 24.9313];
