@@ -21,6 +21,16 @@ export const SimulationPage = ({ match }) => {
   const [metadata, setMetadata] = useState({});
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [loadingTimestep, setLoadingTimestep] = useState(false);
+  const [timestep, setTimestep] = useState(0);
+
+  function loadTimestep() {
+    setLoadingTimestep(true);
+
+    setTimeout(() => {
+      setLoadingTimestep(false);
+    }, 1000);
+  }
 
   useEffect(async () => {
     setLoading(true);
@@ -112,6 +122,23 @@ export const SimulationPage = ({ match }) => {
               tile_layer_subdomains={tile_layer_subdomains}
               tile_layer_attribution={tile_layer_attribution}
               tile_layer_opacity={tile_layer_opacity}
+            />
+            {loadingTimestep && (
+              <div class="overlay-spinner d-flex justify-content-center align-items-center">
+                <div class="spinner-border text-light" />
+              </div>
+            )}
+          </div>
+          <div>
+            <label class="form-label">Current timestep: {timestep}</label>
+            <input
+              type="range"
+              class="mb-4 form-range"
+              min="0"
+              max={metadata.steps}
+              value={timestep}
+              onChange={(e) => setTimestep(e.target.value)}
+              onMouseUp={() => loadTimestep()}
             />
           </div>
           <div className="row mb-4 gap-4 w-100 mx-auto">
