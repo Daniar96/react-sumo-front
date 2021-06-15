@@ -80,92 +80,106 @@ export const SimulationPage = ({ match }) => {
     setLoading(false);
   }, [match.params.id]);
 
-  if (loading) {
-    return <div />;
-  }
-
   return (
     <div className="container my-4">
-      <ol className="breadcrumb">
-        <li className="breadcrumb-item">
-          <Link to="/dashboard">Dashboard</Link>
-        </li>
-        <li className="breadcrumb-item active">{metadata.name}</li>
-      </ol>
-      <h1 className="text-center mb-4">{metadata.name}</h1>
-      <div className="mb-4 card">
-        <SylvereyeRoadNetwork
-          setProps={setProps}
-          edges_data={edges}
-          nodes_data={nodes}
-          map_center={[edges[50].coords[0][0], edges[50].coords[0][1]]}
-          map_zoom={map_zoom}
-          map_style={map_style}
-          tile_layer_url={tile_layer_url}
-          tile_layer_subdomains={tile_layer_subdomains}
-          tile_layer_attribution={tile_layer_attribution}
-          tile_layer_opacity={tile_layer_opacity}
-        />
-      </div>
-      <div className="row mb-4 gap-4 w-100 mx-auto">
-        <div className="col card">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={{
-              title: { text: "Average turns taken by each car" },
-              series: [
-                {
-                  data: [8, 4, 2, 1, 2, 4, 8, 16],
-                },
-                {
-                  data: [1, 1, 2, 3, 5, 8, 13, 21],
-                },
-              ],
-            }}
-          />
-        </div>
-        <div className="col card">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={{
-              title: { text: "Number of vehicles on the road" },
-              series: [
-                {
-                  data: [58, 3254, 23, 532, 6135],
-                },
-              ],
-            }}
-          />
-        </div>
-        <div className="col card">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={{
-              title: { text: "Something" },
-              series: [
-                {
-                  data: [1, 1, 2, 3, 5, 8, 13, 21],
-                },
-              ],
-            }}
-          />
-        </div>
-      </div>
-      <div className="mb-4">
+      {loading ? (
         <div>
-          <b>Date: </b>
-          {metadata.date}
+          <ol className="breadcrumb">
+            <li className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </li>
+            <li className="breadcrumb-item active">
+              Simulation {match.params.id}
+            </li>
+          </ol>
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" />
+          </div>
         </div>
+      ) : (
         <div>
-          <b>Description: </b>
-          {metadata.description}
+          <ol className="breadcrumb">
+            <li className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </li>
+            <li className="breadcrumb-item active">{metadata.name}</li>
+          </ol>
+          <h1 className="text-center mb-4">{metadata.name}</h1>
+          <div className="mb-4 card">
+            <SylvereyeRoadNetwork
+              setProps={setProps}
+              edges_data={edges}
+              nodes_data={nodes}
+              map_center={[edges[50].coords[0][0], edges[50].coords[0][1]]}
+              map_zoom={map_zoom}
+              map_style={map_style}
+              tile_layer_url={tile_layer_url}
+              tile_layer_subdomains={tile_layer_subdomains}
+              tile_layer_attribution={tile_layer_attribution}
+              tile_layer_opacity={tile_layer_opacity}
+            />
+          </div>
+          <div className="row mb-4 gap-4 w-100 mx-auto">
+            <div className="col card">
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={{
+                  title: { text: "Average turns taken by each car" },
+                  series: [
+                    {
+                      data: [8, 4, 2, 1, 2, 4, 8, 16],
+                    },
+                    {
+                      data: [1, 1, 2, 3, 5, 8, 13, 21],
+                    },
+                  ],
+                }}
+              />
+            </div>
+            <div className="col card">
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={{
+                  title: { text: "Number of vehicles on the road" },
+                  series: [
+                    {
+                      data: [58, 3254, 23, 532, 6135],
+                    },
+                  ],
+                }}
+              />
+            </div>
+            <div className="col card">
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={{
+                  title: { text: "Something" },
+                  series: [
+                    {
+                      data: [1, 1, 2, 3, 5, 8, 13, 21],
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
+          <div className="mb-4">
+            <div>
+              <b>Date: </b>
+              {metadata.date}
+            </div>
+            <div>
+              <b>Description: </b>
+              {metadata.description}
+            </div>
+          </div>
+          <div className="btn-group">
+            <button className="btn btn-outline-secondary">Edit</button>
+            <button className="btn btn-outline-primary">Download</button>
+            <button className="btn btn-outline-danger">Delete</button>
+          </div>
         </div>
-      </div>
-      <div className="btn-group">
-        <button className="btn btn-outline-secondary">Edit</button>
-        <button className="btn btn-outline-primary">Download</button>
-        <button className="btn btn-outline-danger">Delete</button>
-      </div>
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 export const DashboardPage = () => {
   const [search, setSearch] = useState("");
   const [simulations, setSimulations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:8080/project_war/simulations")
@@ -20,7 +21,8 @@ export const DashboardPage = () => {
             description: simulation.description,
           })),
         ]);
-      });
+      })
+      .then(() => setLoading(false));
   }, []);
 
   const simulationsList = simulations
@@ -53,7 +55,13 @@ export const DashboardPage = () => {
         />
         <button className="btn btn-outline-primary">Upload</button>
       </div>
-      <div className="list-group">{simulationsList}</div>
+      {loading ? (
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border" />
+        </div>
+      ) : (
+        <div className="list-group">{simulationsList}</div>
+      )}
     </div>
   );
 };
