@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE } from "../../../util";
 
 export const DashboardPage = () => {
   const [search, setSearch] = useState("");
@@ -7,7 +8,7 @@ export const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8080/project_war/simulations")
+    fetch(`${API_BASE}/simulations`)
       .then((res) => res.json())
       .then((json) => {
         console.log(json);

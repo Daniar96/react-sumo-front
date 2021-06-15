@@ -3,6 +3,7 @@ import { SylvereyeRoadNetwork } from "../../../lib/dash_sylvereye.react.min.js";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { Link } from "react-router-dom";
+import { API_BASE } from "../../../util.js";
 
 const map_center = [60.1663, 24.9313];
 const map_zoom = 15;
@@ -26,18 +27,14 @@ export const SimulationPage = ({ match }) => {
 
     setMetadata(
       await (
-        await fetch(
-          `http://localhost:8080/project_war/simulations/${match.params.id}/metadata`
-        )
+        await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
       ).json()
     );
 
     setNodes(
       (
         await (
-          await fetch(
-            `http://localhost:8080/project_war/simulations/${match.params.id}/nodes`
-          )
+          await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`)
         ).json()
       ).map((node) => ({
         lon: node.lon,
@@ -55,9 +52,7 @@ export const SimulationPage = ({ match }) => {
     setEdges(
       (
         await (
-          await fetch(
-            `http://localhost:8080/project_war/simulations/${match.params.id}/edges`
-          )
+          await fetch(`${API_BASE}/simulations/${match.params.id}/edges`)
         ).json()
       )
         .filter((edge) => edge.geometry !== null)
