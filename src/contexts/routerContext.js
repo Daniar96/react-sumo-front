@@ -68,4 +68,13 @@ export const Route = ({component: Component, match}) => {
   return (<Component match={match}/>)
 }
 
+export const Link = ({children, to, ...props}) => {
+
+  return (
+    <RouterContext.Consumer>
+      { ({navigate}) => <a style={{cursor: "pointer"}} onClick={() => navigate(to)}>{children}</a>}
+    </RouterContext.Consumer>
+  )
+}
+
 export default BrowserRouter
