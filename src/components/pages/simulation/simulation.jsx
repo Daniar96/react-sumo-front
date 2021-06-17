@@ -5,7 +5,6 @@ import Highcharts from "highcharts";
 import { Link } from "react-router-dom";
 import { API_BASE } from "../../../util.js";
 
-const map_center = [60.1663, 24.9313];
 const map_zoom = 15;
 const map_style = { width: "100%", height: "75vh" };
 const tile_layer_url =
@@ -14,6 +13,10 @@ const tile_layer_subdomains = "abcd";
 const tile_layer_attribution =
   "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, under <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a>. Data by <a href='http://openstreetmap.org'>OpenStreetMap</a>, under <a href='http://www.openstreetmap.org/copyright'>ODbL</a>.";
 const tile_layer_opacity = 0.2;
+const marker_options = {
+  ...SylvereyeRoadNetwork.defaultProps.marker_options,
+  enable_tooltips: true,
+};
 
 export const SimulationPage = ({ match }) => {
   const [_props, setProps] = useState({});
@@ -23,21 +26,58 @@ export const SimulationPage = ({ match }) => {
   const [edges, setEdges] = useState([]);
   const [loadingTimestep, setLoadingTimestep] = useState(false);
   const [timestep, setTimestep] = useState(0);
+  const [markers, setMarkers] = useState([]);
 
-  function loadTimestep() {
+  async function loadTimestep() {
     setLoadingTimestep(true);
 
-    setTimeout(() => {
-      setLoadingTimestep(false);
-    }, 1000);
+    setMarkers(
+      (
+        await (
+          await fetch(
+            `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`
+          )
+        ).json()
+      )[0].vehicles.map((vehicle) => ({
+        icon_id: "vehicle_marker",
+        icon_image:
+          "<svg height='100' width='100'><circle cx='50' cy='50' r='40' stroke='black' stroke-width='3' fill='red' /></svg>",
+        lon: vehicle.x,
+        lat: vehicle.y,
+        color: 0x066cc,
+        visible: true,
+        alpha: 1.0,
+        size: 0.25,
+        size_scale_min: 0.25,
+        size_scale_max: 0.5,
+        data: vehicle,
+        tooltip: `
+          <b>ID: </b>${vehicle.id}<br/>
+          <b>Speed: </b>${vehicle.spd}<br/>
+          <b>Type: </b>${vehicle.type}
+        `,
+      }))
+    );
+
+    setLoadingTimestep(false);
   }
 
   useEffect(async () => {
     setLoading(true);
 
+    setTimestep(0);
+    loadTimestep();
+
     setMetadata(
       await (
         await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
+      ).json()
+    );
+
+    console.log(
+      "nodes",
+      await (
+        await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`)
       ).json()
     );
 
@@ -57,6 +97,18 @@ export const SimulationPage = ({ match }) => {
           id: node.id,
         },
       }))
+    );
+
+    console.log(
+      "edges",
+      await (
+        await fetch(`${API_BASE}/simulations/${match.params.id}/edges`)
+      ).json(),
+      (
+        await (
+          await fetch(`${API_BASE}/simulations/${match.params.id}/edges`)
+        ).json()
+      ).filter((edge) => edge.geometry === null)
     );
 
     setEdges(
@@ -115,7 +167,9 @@ export const SimulationPage = ({ match }) => {
               setProps={setProps}
               edges_data={edges}
               nodes_data={nodes}
-              map_center={[edges[50].coords[0][0], edges[50].coords[0][1]]}
+              markers_data={markers}
+              marker_options={marker_options}
+              map_center={[edges[0].coords[0][0], edges[0].coords[0][1]]}
               map_zoom={map_zoom}
               map_style={map_style}
               tile_layer_url={tile_layer_url}
@@ -135,7 +189,7 @@ export const SimulationPage = ({ match }) => {
               type="range"
               class="mb-4 form-range"
               min="0"
-              max={metadata.steps}
+              max={metadata.steps - 1}
               value={timestep}
               onChange={(e) => setTimestep(e.target.value)}
               onMouseUp={() => loadTimestep()}
