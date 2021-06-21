@@ -36,7 +36,7 @@ export const DashboardPage = () => {
       >
         <div className="ms-2 me-auto">
           <div className="fw-bold">{sim.name}</div>
-          {sim.date} - {sim.description}
+          {new Date(sim.date).toLocaleString()} - {sim.description}
         </div>
       </Link>
     ));

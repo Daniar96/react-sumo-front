@@ -292,7 +292,7 @@ export const SimulationPage = ({ match }) => {
           <div className="mb-4">
             <div>
               <b>Date: </b>
-              {metadata.date}
+              {new Date(metadata.date).toLocaleString()}
             </div>
             <div>
               <b>Description: </b>
