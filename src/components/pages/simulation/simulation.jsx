@@ -27,6 +27,13 @@ export const SimulationPage = ({ match }) => {
   const [loadingTimestep, setLoadingTimestep] = useState(false);
   const [timestep, setTimestep] = useState(0);
   const [markers, setMarkers] = useState([]);
+  const [vehiclesGraph, setVehiclesGraph] = useState({ count: [], speed: [] });
+  const [timestepGraph, setTimestepGraph] = useState({
+    slowest: [],
+    busiest: [],
+  });
+
+  useEffect(() => console.log(timestepGraph), [timestepGraph]);
 
   async function loadTimestep() {
     setLoadingTimestep(true);
@@ -59,6 +66,22 @@ export const SimulationPage = ({ match }) => {
       }))
     );
 
+    const graphDynamic = await (
+      await fetch(
+        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`
+      )
+    ).json();
+    setTimestepGraph({
+      slowest: graphDynamic.slowest.map((slowest) => [
+        slowest.id.toString(),
+        slowest.speed,
+      ]),
+      busiest: graphDynamic.busiest.map((busiest) => [
+        busiest.edge_id,
+        busiest.count,
+      ]),
+    });
+
     setLoadingTimestep(false);
   }
 
@@ -71,13 +94,6 @@ export const SimulationPage = ({ match }) => {
     setMetadata(
       await (
         await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
-      ).json()
-    );
-
-    console.log(
-      "nodes",
-      await (
-        await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`)
       ).json()
     );
 
@@ -97,18 +113,6 @@ export const SimulationPage = ({ match }) => {
           id: node.id,
         },
       }))
-    );
-
-    console.log(
-      "edges",
-      await (
-        await fetch(`${API_BASE}/simulations/${match.params.id}/edges`)
-      ).json(),
-      (
-        await (
-          await fetch(`${API_BASE}/simulations/${match.params.id}/edges`)
-        ).json()
-      ).filter((edge) => edge.geometry === null)
     );
 
     setEdges(
@@ -133,6 +137,20 @@ export const SimulationPage = ({ match }) => {
           },
         }))
     );
+
+    const graphStatic = await (
+      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`)
+    ).json();
+    setVehiclesGraph({
+      count: graphStatic.count.map((count) => [
+        count.time_step,
+        count.vehicles,
+      ]),
+      speed: graphStatic.speed.map((speed) => [
+        speed.time_step,
+        speed.averagespeed,
+      ]),
+    });
 
     setLoading(false);
   }, [match.params.id]);
@@ -191,7 +209,7 @@ export const SimulationPage = ({ match }) => {
               min="0"
               max={metadata.steps - 1}
               value={timestep}
-              onChange={(e) => setTimestep(e.target.value)}
+              onChange={async (e) => setTimestep(e.target.value)}
               onMouseUp={() => loadTimestep()}
             />
           </div>
@@ -200,26 +218,16 @@ export const SimulationPage = ({ match }) => {
               <HighchartsReact
                 highcharts={Highcharts}
                 options={{
-                  title: { text: "Average turns taken by each car" },
+                  title: { text: "Slowest vehicles this timestep" },
+                  chart: { type: "column" },
+                  xAxis: { title: { text: "Vehicle ID" }, type: "category" },
+                  yAxis: { title: { text: "Speed (m/s)" } },
                   series: [
                     {
-                      data: [8, 4, 2, 1, 2, 4, 8, 16],
-                    },
-                    {
-                      data: [1, 1, 2, 3, 5, 8, 13, 21],
-                    },
-                  ],
-                }}
-              />
-            </div>
-            <div className="col card">
-              <HighchartsReact
-                highcharts={Highcharts}
-                options={{
-                  title: { text: "Number of vehicles on the road" },
-                  series: [
-                    {
-                      data: [58, 3254, 23, 532, 6135],
+                      name: "Vehicle speed",
+                      data: timestepGraph.slowest,
+                      color: "red",
+                      showInLegend: false,
                     },
                   ],
                 }}
@@ -229,10 +237,52 @@ export const SimulationPage = ({ match }) => {
               <HighchartsReact
                 highcharts={Highcharts}
                 options={{
-                  title: { text: "Something" },
+                  title: { text: "Busiest edges this timestep" },
+                  chart: { type: "column" },
+                  xAxis: { title: { text: "Edge ID" }, type: "category" },
+                  yAxis: { title: { text: "Number of vehicles" } },
                   series: [
                     {
-                      data: [1, 1, 2, 3, 5, 8, 13, 21],
+                      name: "Number of vehicles",
+                      data: timestepGraph.busiest,
+                      color: "red",
+                      showInLegend: false,
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
+          <div className="row mb-4 gap-4 w-100 mx-auto">
+            <div className="col card">
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={{
+                  title: { text: "Average vehicle speed over time" },
+                  xAxis: { title: { text: "Timestep" } },
+                  yAxis: { title: { text: "Average speed (m/s)" } },
+                  series: [
+                    {
+                      name: "Average speed",
+                      data: vehiclesGraph.speed,
+                      showInLegend: false,
+                    },
+                  ],
+                }}
+              />
+            </div>
+            <div className="col card">
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={{
+                  title: { text: "Number of vehicles over time" },
+                  xAxis: { title: { text: "Timestep" } },
+                  yAxis: { title: { text: "Vehicles" } },
+                  series: [
+                    {
+                      name: "Number of vehicles",
+                      data: vehiclesGraph.count,
+                      showInLegend: false,
                     },
                   ],
                 }}
