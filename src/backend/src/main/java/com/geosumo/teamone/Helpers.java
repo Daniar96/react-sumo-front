@@ -14,10 +14,10 @@ import static com.geosumo.teamone.queries.DataCreationQueries.*;
 
 public class Helpers {
     private static final int CHUNK_LEN = 20_000_000;
-    private static final String url = "jdbc:postgresql://bronto.ewi.utwente.nl/";
-    private static final String user = "dab_di20212b_167";
-    private static final String password = "i449stWjyfgclDCm";
-    private static final String schema = "?currentSchema=geo_sumo";
+    private static final String URL = "jdbc:postgresql://bronto.ewi.utwente.nl/";
+    private static final String USER = "dab_di20212b_167";
+    private static final String PASSWORD = "i449stWjyfgclDCm";
+    private static final String SCHEMA = "?currentSchema=geo_sumo";
     private static final Connection connection = connectToDB();
 
     public static void processFiles(String simulationName, String simulationDesc, String... files) throws SQLException, NullPointerException {
@@ -29,7 +29,7 @@ public class Helpers {
             // Clean leftovers
             cleanup(false);
         } catch (SQLException | NullPointerException ex) {
-            System.out.println(ex.getMessage());
+            System.err.println(ex.getMessage());
             cleanup(true);
         }
     }
@@ -42,25 +42,23 @@ public class Helpers {
      */
     public static String getFromDatabasePrepared(String query, int... param) throws SQLException {
         try {
-            if (connection == null) throw new SQLException("Not connected to a database");
+            try (PreparedStatement pr = connection.prepareStatement(query)) {
+                for (int i = 0; i < param.length; i++) {
+                    pr.setInt(i + 1, param[i]);
+                }
 
-            PreparedStatement pr = connection.prepareStatement(query);
-            for (int i = 0; i < param.length; i++) {
-                pr.setInt(i + 1, param[i]);
-            }
-
-            ResultSet fin = pr.executeQuery();
-            if (fin.next()) {
-                return fin.getString(1);
-            } else {
-                return "{}";
+                ResultSet fin = pr.executeQuery();
+                if (fin.next()) {
+                    return fin.getString(1);
+                } else {
+                    return "{}";
+                }
             }
         } catch (SQLException e) {
-            System.out.println("The given query was wrong!");
             e.printStackTrace();
             return null;
         } catch (NullPointerException e) {
-            System.out.println("Could not connect to the database");
+            System.err.println("Could not connect to the database");
             return null;
         }
     }
@@ -70,20 +68,18 @@ public class Helpers {
      */
     private static Connection connectToDB() {
         try {
-            Class.forName("org.postgresql.Driver");
-            Connection ret = DriverManager.getConnection(url + user + schema, user, password);
-            System.out.println("You have connected to database!");
-            if (ret == null) return null;
+            Connection ret = DriverManager.getConnection(URL + USER + SCHEMA, USER, PASSWORD);
 
             // Make sure we have the tables ready
-            var statement = ret.prepareStatement(CREATE);
-            statement.executeUpdate();
+            try (PreparedStatement statement = ret.prepareStatement(CREATE)) {
+                statement.executeUpdate();
+            }
+
+            System.out.println("Database connection succeeded!");
 
             return ret;
         } catch (SQLException e) {
-            System.out.println("Can't connect to db: " + e.getMessage());
-            return null;
-        } catch (ClassNotFoundException ignore) {
+            System.err.println("Failed to connect to database: " + e.getMessage());
             return null;
         }
     }
@@ -96,16 +92,15 @@ public class Helpers {
      * @param index index at which to put the data
      */
     private static void sendData(String data, String query, int index) throws SQLException {
-        if (connection == null) throw new SQLException("Not connected to a database");
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            int len = data.length();
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        int len = data.length();
-
-        for (int start = 0; start < len; start += CHUNK_LEN) {
-            int end = Math.min(start + CHUNK_LEN, len);
-            statement.setString(1, data.substring(start, end));
-            statement.setInt(2, index);
-            statement.executeUpdate();
+            for (int start = 0; start < len; start += CHUNK_LEN) {
+                int end = Math.min(start + CHUNK_LEN, len);
+                statement.setString(1, data.substring(start, end));
+                statement.setInt(2, index);
+                statement.executeUpdate();
+            }
         }
     }
 
@@ -152,89 +147,105 @@ public class Helpers {
      */
     private static int sendFiles(String[] files) throws SQLException, NullPointerException {
         if (files == null) throw new NullPointerException("Data was null");
-        if (connection == null) throw new SQLException("Not connected to a database");
 
-        PreparedStatement initial = connection.prepareStatement(SWITCH_SCHEMA);
-        initial.executeUpdate();
-
-        initial = connection.prepareStatement(INSERT);
-        initial.execute();
-        ResultSet result = initial.getResultSet();
-        result.next();
-        int index = result.getInt(1);
-
-        for (String data : files) {
-            FileType type = FileType.getType(getTopElement(data));
-            if (type == null) throw new NullPointerException("Not a valid simulation file");
-
-            String column = type.getColumn();
-            sendData(data, getQuery(column), index);
+        try (PreparedStatement initial = connection.prepareStatement(SWITCH_SCHEMA)) {
+            initial.executeUpdate();
         }
 
-        return index;
+        try (PreparedStatement initial = connection.prepareStatement(INSERT)) {
+            initial.execute();
+            ResultSet result = initial.getResultSet();
+
+            result.next();
+            int index = result.getInt(1);
+
+            for (String data : files) {
+                FileType type = FileType.getType(getTopElement(data));
+                if (type == null) throw new NullPointerException("Not a valid simulation file");
+
+                String column = type.getColumn();
+                sendData(data, getQuery(column), index);
+            }
+
+            return index;
+        }
     }
 
     private static void processData(String name, String desc, int fileIndex) throws SQLException {
         if (connection == null) throw new SQLException();
-        // Put data into the simulation table
-        PreparedStatement createSim = connection.prepareStatement(INSERT_SIMULATION);
-        createSim.setString(1, name);
-        createSim.setString(2, desc);
-        createSim.execute();
 
-        // Get the simulationId
-        ResultSet result = createSim.getResultSet();
-        if(!result.next()) throw new SQLException();
-        int simId = result.getInt(1);
+        int simId;
+
+        // Put data into the simulation table
+        try (PreparedStatement createSim = connection.prepareStatement(INSERT_SIMULATION)) {
+            createSim.setString(1, name);
+            createSim.setString(2, desc);
+            createSim.execute();
+
+            // Get the simulationId
+            ResultSet result = createSim.getResultSet();
+            if (!result.next()) throw new SQLException();
+            simId = result.getInt(1);
+        }
 
         // Fill roundabout table
-        PreparedStatement fillRoundabout = connection.prepareStatement(INSERT_ROUNDABOUT);
-        fillRoundabout.setInt(1, simId);
-        fillRoundabout.setInt(2, fileIndex);
-        fillRoundabout.executeUpdate();
+        try (PreparedStatement fillRoundabout = connection.prepareStatement(INSERT_ROUNDABOUT)) {
+            fillRoundabout.setInt(1, simId);
+            fillRoundabout.setInt(2, fileIndex);
+            fillRoundabout.executeUpdate();
+        }
 
         // Fill route table
-        PreparedStatement fillRoute = connection.prepareStatement(INSERT_ROUTE);
-        fillRoute.setInt(2, fileIndex);
-        fillRoute.setInt(1, simId);
-        fillRoute.executeUpdate();
+        try (PreparedStatement fillRoute = connection.prepareStatement(INSERT_ROUTE)) {
+            fillRoute.setInt(2, fileIndex);
+            fillRoute.setInt(1, simId);
+            fillRoute.executeUpdate();
+        }
 
         // Fill output table
-        PreparedStatement fillOutput = connection.prepareStatement(INSERT_OUTPUT);
-        fillOutput.setInt(1, simId);
-        fillOutput.setInt(2, fileIndex);
-        fillOutput.executeUpdate();
+        try (PreparedStatement fillOutput = connection.prepareStatement(INSERT_OUTPUT)) {
+            fillOutput.setInt(1, simId);
+            fillOutput.setInt(2, fileIndex);
+            fillOutput.executeUpdate();
+        }
 
         // Fill node table and all related tables
-        PreparedStatement fillNode = connection.prepareStatement(getInsertNode(fileIndex));
-        fillNode.setInt(1, simId);
-        fillNode.setInt(2, simId);
-        fillNode.setInt(3, simId);
-        fillNode.executeUpdate();
+        try (PreparedStatement fillNode = connection.prepareStatement(getInsertNode(fileIndex))) {
+            fillNode.setInt(1, simId);
+            fillNode.setInt(2, simId);
+            fillNode.setInt(3, simId);
+            fillNode.executeUpdate();
+        }
 
         // Fill edge table and all related tables
-        PreparedStatement fillEdge = connection.prepareStatement(getInsertEdge(fileIndex));
-        fillEdge.setInt(1, simId);
-        fillEdge.setInt(2, simId);
-        fillEdge.setInt(3, simId);
-        fillEdge.setInt(4, fileIndex);
-        fillEdge.executeUpdate();
+        try (PreparedStatement fillEdge = connection.prepareStatement(getInsertEdge(fileIndex))) {
+            fillEdge.setInt(1, simId);
+            fillEdge.setInt(2, simId);
+            fillEdge.setInt(3, simId);
+            fillEdge.setInt(4, fileIndex);
+            fillEdge.executeUpdate();
+        }
     }
 
     private static void cleanup(boolean fullCleanup) throws SQLException {
-        if (connection == null) throw new SQLException("Connection was null");
         // DROP views created while populating the database
-        PreparedStatement removeTempData = connection.prepareStatement(DROP_VIEWS);
-        removeTempData.executeUpdate();
+        try (PreparedStatement removeTempData = connection.prepareStatement(DROP_VIEWS)) {
+            removeTempData.executeUpdate();
+        }
+
         // Erase the files table
-        removeTempData = connection.prepareStatement(ERASE_FILES);
-        removeTempData.executeUpdate();
+        try (PreparedStatement removeTempData = connection.prepareStatement(ERASE_FILES)) {
+            removeTempData.executeUpdate();
+        }
 
         if (fullCleanup) {
-            PreparedStatement reset = connection.prepareStatement(DROP);
-            reset.executeUpdate();
-            reset = connection.prepareStatement(CREATE);
-            reset.executeUpdate();
+            try (PreparedStatement reset = connection.prepareStatement(DROP)) {
+                reset.executeUpdate();
+            }
+
+            try (PreparedStatement reset = connection.prepareStatement(CREATE)) {
+                reset.executeUpdate();
+            }
         }
     }
 }
