@@ -187,7 +187,7 @@ export const SimulationPage = ({ match }) => {
               nodes_data={nodes}
               markers_data={markers}
               marker_options={marker_options}
-              map_center={[edges[0].coords[0][0], edges[0].coords[0][1]]}
+              map_center={[nodes[0].lat, nodes[0].lon]}
               map_zoom={map_zoom}
               map_style={map_style}
               tile_layer_url={tile_layer_url}
@@ -232,6 +232,11 @@ export const SimulationPage = ({ match }) => {
                   ],
                 }}
               />
+              {loadingTimestep && (
+                <div class="overlay-spinner d-flex justify-content-center align-items-center">
+                  <div class="spinner-border text-light" />
+                </div>
+              )}
             </div>
             <div className="col card">
               <HighchartsReact
@@ -251,6 +256,11 @@ export const SimulationPage = ({ match }) => {
                   ],
                 }}
               />
+              {loadingTimestep && (
+                <div class="overlay-spinner d-flex justify-content-center align-items-center">
+                  <div class="spinner-border text-light" />
+                </div>
+              )}
             </div>
           </div>
           <div className="row mb-4 gap-4 w-100 mx-auto">
