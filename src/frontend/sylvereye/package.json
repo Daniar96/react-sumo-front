@@ -1,0 +1,9 @@
+{
+  "name": "react-sylvereye",
+  "description": "",
+  "version": "0.1.0",
+  "main": "dash_sylvereye.react.min.js",
+  "files": ["dash_sylvereye.react.min.js"],
+  "dependencies": {},
+  "devDependencies": {}
+}

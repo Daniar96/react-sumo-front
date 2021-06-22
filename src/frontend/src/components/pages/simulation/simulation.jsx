@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SylvereyeRoadNetwork } from "../../../lib/dash_sylvereye.react.min.js";
+import { SylvereyeRoadNetwork } from "react-sylvereye";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { Link } from "react-router-dom";
