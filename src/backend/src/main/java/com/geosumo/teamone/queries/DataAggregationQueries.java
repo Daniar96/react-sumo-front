@@ -36,7 +36,7 @@ public class DataAggregationQueries {
                     "     LATERAL ( SELECT jsonb_build_object('id', node_id, 'lon', x, 'lat', y) AS data) nodes " +
                     "WHERE sim_id = ?";
 
-    public static final String getAllEdges =
+    public static final String GET_ALL_EDGES =
             "SELECT jsonb_agg(ultimateData.line) " +
                     "FROM ( " +
                     "         SELECT json_build_object('id', e.edge_id, 'start', e.start, 'finish', e.finish, " +

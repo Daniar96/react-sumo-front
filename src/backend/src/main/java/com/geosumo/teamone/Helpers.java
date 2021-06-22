@@ -41,25 +41,17 @@ public class Helpers {
      * @param param parameters for the query
      */
     public static String getFromDatabasePrepared(String query, int... param) throws SQLException {
-        try {
-            try (PreparedStatement pr = connection.prepareStatement(query)) {
-                for (int i = 0; i < param.length; i++) {
-                    pr.setInt(i + 1, param[i]);
-                }
-
-                ResultSet fin = pr.executeQuery();
-                if (fin.next()) {
-                    return fin.getString(1);
-                } else {
-                    return "{}";
-                }
+        try (PreparedStatement pr = connection.prepareStatement(query)) {
+            for (int i = 0; i < param.length; i++) {
+                pr.setInt(i + 1, param[i]);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NullPointerException e) {
-            System.err.println("Could not connect to the database");
-            return null;
+
+            ResultSet fin = pr.executeQuery();
+            if (fin.next()) {
+                return fin.getString(1);
+            } else {
+                return "{}";
+            }
         }
     }
 
@@ -68,6 +60,7 @@ public class Helpers {
      */
     private static Connection connectToDB() {
         try {
+            Class.forName("org.postgresql.Driver");
             Connection ret = DriverManager.getConnection(URL + USER + SCHEMA, USER, PASSWORD);
 
             // Make sure we have the tables ready
@@ -78,7 +71,7 @@ public class Helpers {
             System.out.println("Database connection succeeded!");
 
             return ret;
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Failed to connect to database: " + e.getMessage());
             return null;
         }
