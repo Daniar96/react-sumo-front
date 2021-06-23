@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SylvereyeRoadNetwork } from "react-sylvereye";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import { Link } from "react-router-dom";
+import { Link } from "../../../contexts/routerContext"
 import { API_BASE } from "../../../util.js";
 
 const map_zoom = 15;
