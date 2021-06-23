@@ -35,6 +35,13 @@ export const SimulationPage = ({ match }) => {
 
   useEffect(() => console.log(timestepGraph), [timestepGraph]);
 
+  function deleteSimulation() {
+    if (confirm("Are you sure you want to delete this simulation?")) {
+      // DELETE /simulations/id
+      window.location.href = "../dashboard";
+    }
+  }
+
   async function loadTimestep() {
     setLoadingTimestep(true);
 
@@ -311,8 +318,12 @@ export const SimulationPage = ({ match }) => {
           </div>
           <div className="btn-group">
             <button className="btn btn-outline-secondary">Edit</button>
-            <button className="btn btn-outline-primary">Download</button>
-            <button className="btn btn-outline-danger">Delete</button>
+            <button
+              className="btn btn-outline-danger"
+              onClick={deleteSimulation}
+            >
+              Delete
+            </button>
           </div>
         </div>
       )}
