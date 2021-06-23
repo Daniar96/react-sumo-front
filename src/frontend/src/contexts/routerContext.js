@@ -77,4 +77,12 @@ export const Link = ({children, to, ...props}) => {
   )
 }
 
+export const Redirect = ({to}) => {
+  return (
+    <RouterContext.Consumer>
+      { ({navigate}) => (navigate({to}))}
+    </RouterContext.Consumer>
+  )
+}
+
 export default BrowserRouter
