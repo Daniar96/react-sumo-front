@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SylvereyeRoadNetwork } from "react-sylvereye";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
-import { Link } from "../../../contexts/routerContext"
+import { Link } from "../../../contexts/routerContext";
 import { API_BASE } from "../../../util.js";
 
 const map_zoom = 15;
@@ -317,7 +317,12 @@ export const SimulationPage = ({ match }) => {
             </div>
           </div>
           <div className="btn-group">
-            <button className="btn btn-outline-secondary">Edit</button>
+            <Link
+              to={`/edit/${match.params.id}`}
+              className="btn btn-outline-secondary"
+            >
+              Edit
+            </Link>
             <button
               className="btn btn-outline-danger"
               onClick={deleteSimulation}
