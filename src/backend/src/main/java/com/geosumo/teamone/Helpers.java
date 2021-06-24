@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.Arrays;
 
 import static com.geosumo.teamone.queries.DataInsertionQueries.*;
 import static com.geosumo.teamone.queries.DataCreationQueries.*;
@@ -41,6 +42,7 @@ public class Helpers {
      * @param param parameters for the query
      */
     public static String getFromDatabasePrepared(String query, int... param) throws SQLException {
+
         try (PreparedStatement pr = connection.prepareStatement(query)) {
             for (int i = 0; i < param.length; i++) {
                 pr.setInt(i + 1, param[i]);
@@ -54,6 +56,23 @@ public class Helpers {
             }
         }
     }
+
+    public static void updateDatabase(String query, String[] stringParam, int... intParam) throws SQLException {
+        try (PreparedStatement pr = connection.prepareStatement(query)) {
+            int extra = 0;
+            for (int i = 0; i < stringParam.length; i++) {
+                pr.setString(i+1, stringParam[i]);
+                extra = i+1;
+            }
+
+
+            for (int i = 0; i < intParam.length ; i++) {
+                pr.setInt(i + (extra + 1) , intParam[i]);
+            }
+            pr.executeUpdate();
+        }
+    }
+
 
     /**
      * Returns a new database connection. Uses predefined url, user and password

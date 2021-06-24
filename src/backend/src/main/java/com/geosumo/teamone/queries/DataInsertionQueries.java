@@ -141,6 +141,10 @@ public class DataInsertionQueries {
 
     public static final String ERASE_FILES = "DELETE FROM files;";
 
+    public static final String INSERT_NEW_METADATA = "UPDATE simulation\n" +
+            "SET name = ?, description = ?\n" +
+            "WHERE id = ?;";
+
     public static String getInsertNode(int fileIndex) {
         return String.format(INSERT_NODE, fileIndex);
     }

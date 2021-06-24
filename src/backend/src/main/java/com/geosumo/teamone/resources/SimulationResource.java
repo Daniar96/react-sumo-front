@@ -2,6 +2,7 @@ package com.geosumo.teamone.resources;
 
 import com.geosumo.teamone.dao.SimulationDao;
 import com.geosumo.teamone.models.DynamicGraphs;
+import com.geosumo.teamone.models.NewMetadata;
 import com.geosumo.teamone.models.StaticGraphs;
 
 import javax.ws.rs.*;
@@ -70,9 +71,14 @@ public class SimulationResource {
 
 
     @Path("metadata")
-    @POST
-    @Consumes(MediaType.TEXT_PLAIN)
-    public void postMetadata(String input) {
-        System.out.println(input);
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON})
+    public void postMetadata(NewMetadata input) throws SQLException{
+        SimulationDao.INSTANCE.setMetadata(id, input.getName(), input.getDescription());
+    }
+
+    @DELETE
+    public void deleteSimulation() throws SQLException{
+        SimulationDao.INSTANCE.deleteSim(id);
     }
 }
