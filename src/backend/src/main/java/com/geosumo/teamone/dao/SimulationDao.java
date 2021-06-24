@@ -14,7 +14,7 @@ import java.util.zip.ZipInputStream;
 
 import static com.geosumo.teamone.Helpers.*;
 import static com.geosumo.teamone.queries.DataAggregationQueries.*;
-import static com.geosumo.teamone.queries.DataDeletionQueries.DELETE_SIMULATION;
+import static com.geosumo.teamone.queries.DataDeletionQueries.*;
 import static com.geosumo.teamone.queries.DataInsertionQueries.*;
 
 public enum SimulationDao {
