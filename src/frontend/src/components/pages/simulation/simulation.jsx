@@ -32,6 +32,11 @@ export const SimulationPage = ({ match }) => {
     slowest: [],
     busiest: [],
   });
+  const [show, setShow] = useState({
+    nodes: true,
+    edges: true,
+    vehicles: true,
+  });
 
   useEffect(() => console.log(timestepGraph), [timestepGraph]);
 
@@ -190,6 +195,46 @@ export const SimulationPage = ({ match }) => {
             <li className="breadcrumb-item active">{metadata.name}</li>
           </ol>
           <h1 className="text-center mb-4">{metadata.name}</h1>
+          <div className="mb-2">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="show-nodes"
+                checked={show.nodes}
+                onChange={(e) => setShow({ ...show, nodes: e.target.checked })}
+              />
+              <label class="form-check-label" for="show-nodes">
+                Show nodes
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="show-edges"
+                checked={show.edges}
+                onChange={(e) => setShow({ ...show, edges: e.target.checked })}
+              />
+              <label class="form-check-label" for="show-edges">
+                Show edges
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="show-vehicles"
+                checked={show.vehicles}
+                onChange={(e) =>
+                  setShow({ ...show, vehicles: e.target.checked })
+                }
+              />
+              <label class="form-check-label" for="show-vehicles">
+                Show vehicles
+              </label>
+            </div>
+          </div>
           <div className="mb-4 card">
             <SylvereyeRoadNetwork
               setProps={setProps}
@@ -200,6 +245,10 @@ export const SimulationPage = ({ match }) => {
               map_center={[nodes[0].lat, nodes[0].lon]}
               map_zoom={map_zoom}
               map_style={map_style}
+              show_nodes={show.nodes}
+              show_edges={show.edges}
+              show_arrows={show.edges}
+              show_markers={show.vehicles}
               tile_layer_url={tile_layer_url}
               tile_layer_subdomains={tile_layer_subdomains}
               tile_layer_attribution={tile_layer_attribution}
