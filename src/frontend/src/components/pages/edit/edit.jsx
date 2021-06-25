@@ -5,15 +5,36 @@ import { Link } from "../../../contexts/routerContext";
 export const EditPage = ({ match }) => {
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState({});
+  const [name, setName] = useState({});
+  const [description, setDescription] = useState({});
+
+  function submitForm(e) {
+    e.preventDefault();
+    fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+        description: description,
+      }),
+    }).then(() => {
+      location.href = `/sim/${match.params.id}`;
+    });
+  }
 
   useEffect(async () => {
     setLoading(true);
 
-    setMetadata(
-      await (
-        await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
-      ).json()
-    );
+    const metadata = await (
+      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
+    ).json();
+
+    setMetadata(metadata);
+
+    setName(metadata.name);
+    setDescription(metadata.description);
 
     setLoading(false);
   }, [match.params.id]);
@@ -30,10 +51,7 @@ export const EditPage = ({ match }) => {
     return (
       <div className="container my-4">
         <h1 className="text-center mb-4">Edit {metadata.name}</h1>
-        <form
-          action={`${API_BASE}/simulations/${match.params.id}/metadata`}
-          method="POST"
-        >
+        <form onSubmit={submitForm}>
           <div className="form-group mt-3">
             <label className="form-label" for="name">
               Simulation Name
@@ -42,7 +60,8 @@ export const EditPage = ({ match }) => {
               id="name"
               name="name"
               className="form-control"
-              value={metadata.name}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="form-group mt-3">
@@ -53,7 +72,8 @@ export const EditPage = ({ match }) => {
               id="description"
               name="description"
               className="form-control"
-              value={metadata.description}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className="btn-group">
