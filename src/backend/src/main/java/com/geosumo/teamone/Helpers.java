@@ -52,7 +52,7 @@ public class Helpers {
             if (fin.next()) {
                 return fin.getString(1);
             } else {
-                return "{}";
+                return "[]";
             }
         }
     }
@@ -64,12 +64,12 @@ public class Helpers {
                 pr.setString(i+1, stringParam[i]);
                 extra = i+1;
             }
-
-
             for (int i = 0; i < intParam.length ; i++) {
                 pr.setInt(i + (extra + 1) , intParam[i]);
             }
+            System.out.println(pr.toString());
             pr.executeUpdate();
+            System.out.println(query);
         }
     }
 
