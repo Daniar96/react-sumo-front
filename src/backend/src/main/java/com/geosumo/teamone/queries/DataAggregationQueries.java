@@ -64,25 +64,30 @@ public class DataAggregationQueries {
 
     public static final String SLOWEST_VEHICLE_PER_TIME_STEP = "" +
             "SELECT coalesce(jsonb_agg(data), '[]')                         \n" +
-            "FROM ( SELECT vehicle_id AS ID, speed, ARRAY[x, y] AS coords   \n" +
+            "FROM ( SELECT vehicle_id AS ID, speed, x, y                    \n" +
             "       FROM output                                             \n" +
-            "       WHERE sim_id = 1                                        \n" +
-            "       AND time_step = 300                                     \n" +
+            "       WHERE sim_id = ?                                        \n" +
+            "       AND time_step = ?                                       \n" +
             "       AND speed > 0                                           \n" +
             "       ORDER BY speed                                          \n" +
             "       LIMIT 10 ) AS data;                                     \n";
 
     public static final String BUSIEST_ROADS_PER_TIME_STEP =
-            "SELECT jsonb_agg(data)\n" +
-                    "FROM (\n" +
-                    "SELECT edge_id, count(*) AS count\n" +
-                    "FROM output\n" +
-                    "INNER JOIN edge\n" +
-                    "ON output.lane LIKE CONCAT(edge.edge_id, '$_%') ESCAPE '$'\n" +
-                    "WHERE output.sim_id = ?\n" +
-                    "AND output.time_step = ?\n" +
-                    "GROUP by edge.edge_id \n" +
-                    "ORDER by count DESC\n" +
-                    "LIMIT 10) as data";
+            "SELECT jsonb_agg(data)                         \n" +
+                    "FROM(                                  \n" +
+                    " SELECT DISTINCT edge_id, count, (n1.x+n2.x)/2 as x, (n1.y+n2.y)/2 as y\n" +
+                    " FROM(\n" +
+                    "  SELECT edge_id, start, finish, count(*) AS count\n" +
+                    "  FROM output\n" +
+                    "  INNER JOIN edge\n" +
+                    "  ON output.lane LIKE CONCAT(edge.edge_id, '$_%') ESCAPE '$'\n" +
+                    "  WHERE output.sim_id = ?\n" +
+                    "  AND output.time_step = ?\n" +
+                    "  GROUP by edge.edge_id, start, finish \n" +
+                    "  ORDER by count DESC\n" +
+                    "  LIMIT 10) as edge, node n1, node n2\n" +
+                    " WHERE edge.start = n1.node_id\n" +
+                    " AND edge.finish = n2.node_id\n" +
+                    " ORDER BY count DESC) as data";
 
 }
