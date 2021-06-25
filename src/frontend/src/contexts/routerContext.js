@@ -62,20 +62,21 @@ export const Switch = ({ children }) => {
     return URIpair.reduce(matchReducer, { matched: true, params: {} });
   };
 
+  const toRender = (nav, currentPath) =>
+    children.map((child) => {
+      if (child.type !== Route) {
+        return child;
+      } else {
+        const match = routeMatches(currentPath, child.props.path);
+        return match.matched
+          ? cloneElement(child, { path: child.props.path, match: match, history: {push: nav}})
+          : null;
+      }
+    })
+
   return (
     <RouterContext.Consumer>
-      {({ navigate, path }) => {
-        children.map((child) => {
-          if (child.type !== Route) {
-            return child;
-          } else {
-            const match = routeMatches(path, child.props.path);
-            return match.matched
-              ? cloneElement(child, { path: child.props.path, match: match, history: {push: navigate}})
-              : null;
-          }
-        })
-      }}
+      {({ navigate, path }) => toRender(navigate, path)}
     </RouterContext.Consumer>
   );
 };
