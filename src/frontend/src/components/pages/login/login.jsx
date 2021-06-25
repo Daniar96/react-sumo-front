@@ -1,59 +1,88 @@
-export const LoginPage = () =>
-	<div class="container my-4">
-	<br />
-	<br />
-	<div class="row align-items-first">
-	
-	<div class="col-md-5">
-		<h2 class="text-left mb-4 px-3">Login</h2>
-		<div class="rounded-5 shadow p-3 mb-5 bg-body rounded">
-	   <form>
-	  <div class="mb-3">
-	    <label for="login" class="form-label">Username/ Email address</label>
-	    <input type="email" class="form-control" id="login"  />
-	    
-	  </div>
-	  <div class="mb-3">
-	    <label for="logPassword" class="form-label">Password</label>
-	    <input type="password" class="form-control" id="logPassword" />
-	  </div>
-	  <div class="form-text"><a href="#">Forgot password?</a></div>
+import { useState } from 'react'
+import { loginUser, useUserDispatch, useUserState } from '../../../contexts/userContext'
 
-	  <br />	
-	  <button type="submit" class="btn btn-outline-primary">Login</button>
+export const LoginPage = (props) => {
+  const { loading, active } = useUserState()
+  const dispatch = useUserDispatch()
 
-	</form>
-	</div>
-	</div>
-	<div class="col-md-5 offset-md-1 ">
-		<h2 class="text-left mb-4 px-3">Create an account</h2>
-		<div class="rounded-5 shadow p-3 mb-5 bg-body rounded">
-	   <form>
-	   <div class="mb-3">
-	    <label for="regUsername" class="form-label">Username</label>
-	    <input type="username" class="form-control" id="regUsername" />
-	  </div>
-	  <div class="mb-3">
-	    <label for="regEmail" class="form-label">Email address</label>
-	    <input type="email" class="form-control" id="regEmail" />
-	  </div>
-	  <div class="mb-3">
-	    <label for="regPassword" class="form-label">Password</label>
-	    <input type="password" class="form-control" id="regPassword" />
-	  </div>
-	  <div class="mb-3">
-	    <label for="regRepeatPassword" class="form-label">Repeat Password</label>
-	    <input type="password" class="form-control" id="regRepeatPassword" />
-	  </div>
-	  
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-	  <br />	
-	  <button type="submit" class="btn btn-outline-primary">Register</button>
+  console.log(props)
 
-	</form>
-	</div>
-	</div>
-	
-	</div>
-	
-</div>
+  const submitLogin = async (e) => {
+    e.preventDefault()
+    const res = await loginUser(dispatch, {user: username, password: password})
+    if (res.user) {
+
+    }
+    props.history.push('/dashboard')
+  }
+
+  return (
+    <div className="container my-4">
+      <br/>
+      <br/>
+      <div className="row align-items-first">
+
+        <div className="col-md-5">
+          <h2 className="text-left mb-4 px-3">Login</h2>
+          <div className="rounded-5 shadow p-3 mb-5 bg-body rounded">
+            <form>
+              <div className="mb-3">
+                <label htmlFor="login" className="form-label">Username/ Email address</label>
+                <input type="email" className="form-control" id="login" value={username}
+                       onChange={e => setUsername(e.target.value)}/>
+
+              </div>
+              <div className="mb-3">
+                <label htmlFor="logPassword" className="form-label">Password</label>
+                <input type="password" className="form-control" id="logPassword" value={password}
+                       onChange={e => setPassword(e.target.value)}/>
+              </div>
+              <div className="form-text"><a href="#">Forgot password?</a></div>
+
+              <br/>
+              { loading ?
+                <div>loading</div>
+                :
+                <button type="submit" className="btn btn-outline-primary" onClick={submitLogin}>Login</button>
+              }
+
+            </form>
+          </div>
+        </div>
+        <div className="col-md-5 offset-md-1 ">
+          <h2 className="text-left mb-4 px-3">Create an account</h2>
+          <div className="rounded-5 shadow p-3 mb-5 bg-body rounded">
+            <form>
+              <div className="mb-3">
+                <label htmlFor="regUsername" className="form-label">Username</label>
+                <input type="username" className="form-control" id="regUsername"/>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="regEmail" className="form-label">Email address</label>
+                <input type="email" className="form-control" id="regEmail"/>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="regPassword" className="form-label">Password</label>
+                <input type="password" className="form-control" id="regPassword"/>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="regRepeatPassword" className="form-label">Repeat Password</label>
+                <input type="password" className="form-control" id="regRepeatPassword"/>
+              </div>
+
+
+              <br/>
+              <button type="submit" className="btn btn-outline-primary">Register</button>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  )
+}

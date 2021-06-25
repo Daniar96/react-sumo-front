@@ -42,7 +42,6 @@ export const Switch = ({ children }) => {
     const URIpair = routeTokens.map((e, i) => {
       return { route: e, url: i >= URItokens.length ? null : URItokens[i] };
     });
-    console.log(URIpair);
 
     const matchReducer = (acc, pair) => {
       if (acc.matched === false) return acc;
@@ -63,27 +62,26 @@ export const Switch = ({ children }) => {
     return URIpair.reduce(matchReducer, { matched: true, params: {} });
   };
 
-  const toRender = (currentPath) =>
-    children.map((child) => {
-      if (child.type !== Route) {
-        return child;
-      } else {
-        const match = routeMatches(currentPath, child.props.path);
-        return match.matched
-          ? cloneElement(child, { path: child.props.path, match: match })
-          : null;
-      }
-    });
-
   return (
     <RouterContext.Consumer>
-      {({ path }) => toRender(path)}
+      {({ navigate, path }) => {
+        children.map((child) => {
+          if (child.type !== Route) {
+            return child;
+          } else {
+            const match = routeMatches(path, child.props.path);
+            return match.matched
+              ? cloneElement(child, { path: child.props.path, match: match, history: {push: navigate}})
+              : null;
+          }
+        })
+      }}
     </RouterContext.Consumer>
   );
 };
 
-export const Route = ({ component: Component, match }) => {
-  return <Component match={match} />;
+export const Route = ({ component: Component, ...rest}) => {
+  return <Component {...rest} />;
 };
 
 export const Link = ({ children, to, ...props }) => {

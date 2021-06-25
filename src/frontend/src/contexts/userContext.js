@@ -29,7 +29,7 @@ export const loginUser = async (dispatch, payload) => {
           token: res.data.token,
         },
       });
-      return { user: payload.user };
+      return { user: res.data.user };
     } else {
       dispatch({ type: "LOGIN_ERROR", payload: { error: res.data.error } });
       return { error: res.data.error };
