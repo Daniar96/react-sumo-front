@@ -37,7 +37,7 @@ public enum SimulationDao {
     }
 
     public String getEdgesJson(int id) throws SQLException {
-        return getFromDatabasePrepared(GET_ALL_EDGES, id);
+        return getFromDatabasePrepared(GET_ALL_EDGES, id, id, id);
     }
 
     public StaticGraphs getStaticGraphs(int id) throws SQLException {

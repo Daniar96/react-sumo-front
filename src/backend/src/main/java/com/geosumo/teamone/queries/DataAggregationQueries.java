@@ -37,14 +37,19 @@ public class DataAggregationQueries {
                     "WHERE sim_id = ?";
 
     public static final String GET_ALL_EDGES =
-            "SELECT jsonb_agg(ultimateData.line) " +
-                    "FROM ( " +
-                    "         SELECT json_build_object('id', e.edge_id, 'start', e.start, 'finish', e.finish, " +
-                    "                                  'geometry', COALESCE(string_to_array(e.shape, ' '), "+
-                    " string_to_array(CONCAT(CONCAT(nst.x,',',nst.y), ' ', CONCAT(nfin.x,',',nfin.y)),' '))) AS line " +
-                    "         FROM node nst, edge e, node nfin" +
-                    "         WHERE e.sim_id = ? AND e.start = nst.node_id AND e.finish = nfin.node_id" +
-                    "         ORDER BY e.edge_id) AS ultimateData;";
+            "SELECT jsonb_agg(ultimateData.line)                    \n" +
+                    "FROM (                                         \n" +
+                    " SELECT json_build_object('id', e.edge_id, 'start', e.start, 'finish', e.finish,                                   \n" +
+                    "                          'geometry', COALESCE(string_to_array(e.shape, ' '),  \n" +
+                    "                          string_to_array(CONCAT(CONCAT(nst.x,',',nst.y), ' ', \n" +
+                    "                          CONCAT(nfin.x,',',nfin.y)),' '))) AS line          \n" +
+                    " FROM node nst, edge e, node nfin \n" +
+                    " WHERE e.sim_id  = ? \n" +
+                    " AND nst.sim_id  = ? \n" +
+                    " AND nfin.sim_id = ? \n" +
+                    " AND e.start = nst.node_id \n" +
+                    " AND e.finish = nfin.node_id \n" +
+                    " ORDER BY e.edge_id) AS ultimateData;";
 
 
     public static final String VEHICLE_PER_TIME_STEP = "SELECT jsonb_agg(data) " +
