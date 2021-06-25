@@ -3,6 +3,12 @@ import { Link } from "../../../contexts/routerContext";
 
 export const UploadPage = () => (
   <div className="container my-4">
+    <ol className="breadcrumb">
+      <li className="breadcrumb-item">
+        <Link to="/dashboard">Dashboard</Link>
+      </li>
+      <li className="breadcrumb-item active">Upload</li>
+    </ol>
     <h1 className="text-center mb-4">Upload a simulation</h1>
     <form action={`${API_BASE}/simulations`} method="POST">
       <div className="form-group mt-3">

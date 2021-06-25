@@ -41,7 +41,18 @@ export const EditPage = ({ match }) => {
 
   if (loading) {
     return (
-      <div className="my-4">
+      <div className="container my-4">
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item">
+            <Link to="/dashboard">Dashboard</Link>
+          </li>
+          <li className="breadcrumb-item">
+            <Link to={`/sim/${match.params.id}`}>
+              Simulation {match.params.id}
+            </Link>
+          </li>
+          <li className="breadcrumb-item active">Edit</li>
+        </ol>
         <div class="mt-3 d-flex justify-content-center">
           <div class="spinner-border" />
         </div>
@@ -50,6 +61,15 @@ export const EditPage = ({ match }) => {
   } else {
     return (
       <div className="container my-4">
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item">
+            <Link to="/dashboard">Dashboard</Link>
+          </li>
+          <li className="breadcrumb-item">
+            <Link to={`/sim/${match.params.id}`}>{metadata.name}</Link>
+          </li>
+          <li className="breadcrumb-item active">Edit</li>
+        </ol>
         <h1 className="text-center mb-4">Edit {metadata.name}</h1>
         <form onSubmit={submitForm}>
           <div className="form-group mt-3">
