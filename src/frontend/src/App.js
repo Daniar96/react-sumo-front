@@ -12,6 +12,7 @@ import DashboardPage from "./components/pages/dashboard";
 import LoginPage from "./components/pages/login";
 import SimulationPage from "./components/pages/simulation";
 import EditPage from "./components/pages/edit";
+import UploadPage from "./components/pages/upload";
 import { UserProvider, useUserState } from "./contexts/userContext";
 
 const ProtectedRoute = ({ props }) => {
@@ -32,6 +33,7 @@ function App() {
               <Route path="/dashboard" component={DashboardPage} />
               <Route path="/edit/:id" component={EditPage} />
               <Route path="/sim/:id" component={SimulationPage} />
+              <Route path="/upload" component={UploadPage} />
               <Route exact path="/" component={LoginPage} />
             </Switch>
           </main>

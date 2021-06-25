@@ -54,7 +54,9 @@ export const DashboardPage = () => {
           placeholder="Search..."
           onChange={(event) => setSearch(event.target.value)}
         />
-        <button className="btn btn-outline-primary">Upload</button>
+        <Link to="/upload" className="btn btn-outline-primary">
+          Upload
+        </Link>
       </div>
       {loading ? (
         <div class="d-flex justify-content-center">

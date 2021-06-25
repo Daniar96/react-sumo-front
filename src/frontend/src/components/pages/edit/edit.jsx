@@ -38,14 +38,20 @@ export const EditPage = ({ match }) => {
             <label className="form-label" for="name">
               Simulation Name
             </label>
-            <input id="name" className="form-control" value={metadata.name} />
+            <input
+              id="name"
+              name="name"
+              className="form-control"
+              value={metadata.name}
+            />
           </div>
           <div className="form-group mt-3">
-            <label className="form-label" for="name">
+            <label className="form-label" for="description">
               Description
             </label>
             <input
-              id="name"
+              id="description"
+              name="description"
               className="form-control"
               value={metadata.description}
             />
@@ -56,7 +62,6 @@ export const EditPage = ({ match }) => {
             </button>
             <Link
               to={`/sim/${match.params.id}`}
-              type="submit"
               className="mt-3 btn btn-outline-secondary"
             >
               Cancel
