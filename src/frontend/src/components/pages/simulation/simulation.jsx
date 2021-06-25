@@ -33,12 +33,32 @@ export const SimulationPage = ({ match }) => {
     busiest: [],
   });
   const [show, setShow] = useState({
+    markerType: "0",
     nodes: true,
     edges: true,
-    vehicles: true,
+    markers: true,
+  });
+  const [potentialMarkers, setPotentialMarkers] = useState({
+    all: [],
+    slow: [],
+    busiest: [],
   });
 
-  useEffect(() => console.log(timestepGraph), [timestepGraph]);
+  useEffect(() => {
+    switch (show.markerType) {
+      case "0":
+        setMarkers(potentialMarkers.all);
+        break;
+      case "1":
+        setMarkers(potentialMarkers.busiest);
+        break;
+      case "2":
+        setMarkers(potentialMarkers.slow);
+        break;
+    }
+
+    console.log(show.markerType, markers, potentialMarkers);
+  }, [potentialMarkers, show.markerType]);
 
   function deleteSimulation() {
     if (confirm("Are you sure you want to delete this simulation?")) {
@@ -53,8 +73,42 @@ export const SimulationPage = ({ match }) => {
   async function loadTimestep() {
     setLoadingTimestep(true);
 
-    setMarkers(
-      (
+    const graphDynamic = await (
+      await fetch(
+        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`
+      )
+    ).json();
+    setTimestepGraph({
+      slowest: graphDynamic.slowest.map((slowest) => [
+        slowest.id.toString(),
+        slowest.speed,
+      ]),
+      busiest: graphDynamic.busiest.map((busiest) => [
+        busiest.edge_id,
+        busiest.count,
+      ]),
+    });
+
+    setPotentialMarkers({
+      slow: graphDynamic.slowest.map((slowest) => ({
+        icon_id: "vehicle_marker",
+        icon_image:
+          "<svg height='100' width='100'><circle cx='50' cy='50' r='40' stroke='black' stroke-width='3' fill='red' /></svg>",
+        lon: slowest.x,
+        lat: slowest.y,
+        color: 0x066cc,
+        visible: true,
+        alpha: 1.0,
+        size: 0.25,
+        size_scale_min: 0.25,
+        size_scale_max: 0.5,
+        data: slowest,
+        tooltip: `
+          <b>ID: </b>${slowest.id}<br/>
+          <b>Speed: </b>${slowest.speed}
+        `,
+      })),
+      all: (
         await (
           await fetch(
             `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`
@@ -78,23 +132,7 @@ export const SimulationPage = ({ match }) => {
           <b>Speed: </b>${vehicle.spd}<br/>
           <b>Type: </b>${vehicle.type}
         `,
-      }))
-    );
-
-    const graphDynamic = await (
-      await fetch(
-        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`
-      )
-    ).json();
-    setTimestepGraph({
-      slowest: graphDynamic.slowest.map((slowest) => [
-        slowest.id.toString(),
-        slowest.speed,
-      ]),
-      busiest: graphDynamic.busiest.map((busiest) => [
-        busiest.edge_id,
-        busiest.count,
-      ]),
+      })),
     });
 
     setLoadingTimestep(false);
@@ -195,45 +233,63 @@ export const SimulationPage = ({ match }) => {
             <li className="breadcrumb-item active">{metadata.name}</li>
           </ol>
           <h1 className="text-center mb-4">{metadata.name}</h1>
-          <div className="mb-2">
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="show-nodes"
-                checked={show.nodes}
-                onChange={(e) => setShow({ ...show, nodes: e.target.checked })}
-              />
-              <label class="form-check-label" for="show-nodes">
-                Show nodes
-              </label>
+          <div className="mb-2 d-flex align-items-center justify-content-between">
+            <div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="show-nodes"
+                  checked={show.nodes}
+                  onChange={(e) =>
+                    setShow({ ...show, nodes: e.target.checked })
+                  }
+                />
+                <label class="form-check-label" for="show-nodes">
+                  Show nodes
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="show-edges"
+                  checked={show.edges}
+                  onChange={(e) =>
+                    setShow({ ...show, edges: e.target.checked })
+                  }
+                />
+                <label class="form-check-label" for="show-edges">
+                  Show edges
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="show-markers"
+                  checked={show.markers}
+                  onChange={(e) =>
+                    setShow({ ...show, markers: e.target.checked })
+                  }
+                />
+                <label class="form-check-label" for="show-markers">
+                  Show markers
+                </label>
+              </div>
             </div>
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="show-edges"
-                checked={show.edges}
-                onChange={(e) => setShow({ ...show, edges: e.target.checked })}
-              />
-              <label class="form-check-label" for="show-edges">
-                Show edges
-              </label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="show-vehicles"
-                checked={show.vehicles}
-                onChange={(e) =>
-                  setShow({ ...show, vehicles: e.target.checked })
-                }
-              />
-              <label class="form-check-label" for="show-vehicles">
-                Show vehicles
-              </label>
-            </div>
+            <select
+              class="form-select"
+              style={{ width: "auto" }}
+              value={show.markerType}
+              onChange={(e) => setShow({ ...show, markerType: e.target.value })}
+            >
+              <option selected value="0">
+                Show all vehicles
+              </option>
+              <option value="1">Show busiest edges</option>
+              <option value="2">Show slowest vehicles</option>
+            </select>
           </div>
           <div className="mb-4 card">
             <SylvereyeRoadNetwork
@@ -248,7 +304,7 @@ export const SimulationPage = ({ match }) => {
               show_nodes={show.nodes}
               show_edges={show.edges}
               show_arrows={show.edges}
-              show_markers={show.vehicles}
+              show_markers={show.markers}
               tile_layer_url={tile_layer_url}
               tile_layer_subdomains={tile_layer_subdomains}
               tile_layer_attribution={tile_layer_attribution}
