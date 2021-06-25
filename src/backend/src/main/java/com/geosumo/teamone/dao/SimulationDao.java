@@ -2,22 +2,20 @@ package com.geosumo.teamone.dao;
 
 import com.geosumo.teamone.Helpers;
 import com.geosumo.teamone.models.DynamicGraphs;
-import com.geosumo.teamone.models.NewMetadata;
 import com.geosumo.teamone.models.StaticGraphs;
 
-import java.io.*;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-
-import static com.geosumo.teamone.Helpers.*;
+import static com.geosumo.teamone.Helpers.getFromDatabasePrepared;
+import static com.geosumo.teamone.Helpers.updateDatabase;
 import static com.geosumo.teamone.queries.DataAggregationQueries.*;
-import static com.geosumo.teamone.queries.DataDeletionQueries.*;
-import static com.geosumo.teamone.queries.DataInsertionQueries.*;
+import static com.geosumo.teamone.queries.DataDeletionQueries.DELETE_SIMULATION;
+import static com.geosumo.teamone.queries.DataInsertionQueries.INSERT_NEW_METADATA;
 
 public enum SimulationDao {
     INSTANCE;
@@ -60,12 +58,14 @@ public enum SimulationDao {
     }
 
     public void createNewZipFile(String name, String description, ZipInputStream input) throws IOException, SQLException {
+        System.out.println("uplaoding " + name + " simulation...");
         StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[1024];
         int read = 0;
         List<String> files = new ArrayList<>();
         ZipEntry ze = null;
         while ((ze = input.getNextEntry()) != null) {
+            System.out.println("entry!");
             if (ze.toString().endsWith("net.xml") || ze.toString().endsWith(".sumocfg")) {
                 continue;
             }

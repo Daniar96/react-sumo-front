@@ -10,8 +10,6 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 @Path("/simulations")
@@ -32,11 +30,10 @@ public class SimulationsResource {
         return new SimulationResource(uriInfo, request, id);
     }
 
-    @Path("/upload")
     @POST
     @Consumes("application/zip")
     public void uploadSimulation(@QueryParam("name") String name,
-                                 @QueryParam("Description") String description,
+                                 @QueryParam("description") String description,
                                  InputStream input) throws IOException, SQLException {
         SimulationDao.INSTANCE.createNewZipFile(name, description, new ZipInputStream(input));
     }
