@@ -73,12 +73,12 @@ public class SimulationResource {
     @Path("metadata")
     @PUT
     @Consumes({MediaType.APPLICATION_JSON})
-    public void postMetadata(NewMetadata input) throws SQLException{
+    public void postMetadata(NewMetadata input) throws SQLException {
         SimulationDao.INSTANCE.setMetadata(id, input.getName(), input.getDescription());
     }
 
     @DELETE
-    public void deleteSimulation() throws SQLException{
+    public void deleteSimulation() throws SQLException {
         SimulationDao.INSTANCE.deleteSim(id);
     }
 }

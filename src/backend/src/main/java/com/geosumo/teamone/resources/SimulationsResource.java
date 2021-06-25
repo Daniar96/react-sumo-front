@@ -35,7 +35,9 @@ public class SimulationsResource {
     @Path("/upload")
     @POST
     @Consumes("application/zip")
-    public void uploadSimulation(InputStream input) throws IOException {
-        SimulationDao.INSTANCE.createNewZipFile(new ZipInputStream(input));
+    public void uploadSimulation(@QueryParam("name") String name,
+                                 @QueryParam("Description") String description,
+                                 InputStream input) throws IOException, SQLException {
+        SimulationDao.INSTANCE.createNewZipFile(name, description, new ZipInputStream(input));
     }
 }

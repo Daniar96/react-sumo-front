@@ -1,16 +1,18 @@
 package com.geosumo.teamone.dao;
 
+import com.geosumo.teamone.Helpers;
 import com.geosumo.teamone.models.DynamicGraphs;
 import com.geosumo.teamone.models.NewMetadata;
 import com.geosumo.teamone.models.StaticGraphs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 
 import static com.geosumo.teamone.Helpers.*;
 import static com.geosumo.teamone.queries.DataAggregationQueries.*;
@@ -57,10 +59,24 @@ public enum SimulationDao {
         updateDatabase(DELETE_SIMULATION, new String[0], id);
     }
 
-    public void createNewZipFile(ZipInputStream input) throws IOException {
+    public void createNewZipFile(String name, String description, ZipInputStream input) throws IOException, SQLException {
+        StringBuilder sb = new StringBuilder();
+        byte[] buffer = new byte[1024];
+        int read = 0;
         List<String> files = new ArrayList<>();
         ZipEntry ze = null;
-        while((ze = input.getNextEntry()) != null) {
+        while ((ze = input.getNextEntry()) != null) {
+            if (ze.toString().endsWith("net.xml") || ze.toString().endsWith(".sumocfg")) {
+                continue;
+            }
+            while ((read = input.read(buffer, 0, 1024)) >= 0) {
+                sb.append(new String(buffer, 0, read));
+            }
+            files.add(sb.toString());
+            sb = new StringBuilder();
         }
+        String[] s = new String[files.size()];
+        files.toArray(s);
+        Helpers.processFiles(name, description, s);
     }
 }
