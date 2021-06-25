@@ -37,8 +37,11 @@ export const SimulationPage = ({ match }) => {
 
   function deleteSimulation() {
     if (confirm("Are you sure you want to delete this simulation?")) {
-      // DELETE /simulations/id
-      window.location.href = "../dashboard";
+      fetch(`${API_BASE}/simulations/${match.params.id}`, {
+        method: "DELETE",
+      }).then(() => {
+        window.location.href = "/dashboard";
+      });
     }
   }
 
