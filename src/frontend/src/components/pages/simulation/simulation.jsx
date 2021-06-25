@@ -33,7 +33,7 @@ export const SimulationPage = ({ match }) => {
     busiest: [],
   });
   const [show, setShow] = useState({
-    markerType: 0,
+    markerType: "0",
     nodes: true,
     edges: true,
     markers: true,
@@ -46,16 +46,18 @@ export const SimulationPage = ({ match }) => {
 
   useEffect(() => {
     switch (show.markerType) {
-      case 0:
+      case "0":
         setMarkers(potentialMarkers.all);
         break;
-      case 1:
+      case "1":
         setMarkers(potentialMarkers.busiest);
         break;
-      case 2:
+      case "2":
         setMarkers(potentialMarkers.slow);
         break;
     }
+
+    console.log(show.markerType, markers, potentialMarkers);
   }, [potentialMarkers, show.markerType]);
 
   function deleteSimulation() {
@@ -88,25 +90,24 @@ export const SimulationPage = ({ match }) => {
     });
 
     setPotentialMarkers({
-      // busiest: graphDynamic.slowest.map((slowest) => ({
-      //   icon_id: "vehicle_marker",
-      //   icon_image:
-      //     "<svg height='100' width='100'><circle cx='50' cy='50' r='40' stroke='black' stroke-width='3' fill='red' /></svg>",
-      //   lon: slowest.x,
-      //   lat: slowest.y,
-      //   color: 0x066cc,
-      //   visible: true,
-      //   alpha: 1.0,
-      //   size: 0.25,
-      //   size_scale_min: 0.25,
-      //   size_scale_max: 0.5,
-      //   data: slowest,
-      //   tooltip: `
-      //     <b>ID: </b>${vehicle.id}<br/>
-      //     <b>Speed: </b>${vehicle.spd}<br/>
-      //     <b>Type: </b>${vehicle.type}
-      //   `,
-      // })),
+      slow: graphDynamic.slowest.map((slowest) => ({
+        icon_id: "vehicle_marker",
+        icon_image:
+          "<svg height='100' width='100'><circle cx='50' cy='50' r='40' stroke='black' stroke-width='3' fill='red' /></svg>",
+        lon: slowest.x,
+        lat: slowest.y,
+        color: 0x066cc,
+        visible: true,
+        alpha: 1.0,
+        size: 0.25,
+        size_scale_min: 0.25,
+        size_scale_max: 0.5,
+        data: slowest,
+        tooltip: `
+          <b>ID: </b>${slowest.id}<br/>
+          <b>Speed: </b>${slowest.speed}
+        `,
+      })),
       all: (
         await (
           await fetch(
@@ -283,11 +284,11 @@ export const SimulationPage = ({ match }) => {
               value={show.markerType}
               onChange={(e) => setShow({ ...show, markerType: e.target.value })}
             >
-              <option selected value="1">
+              <option selected value="0">
                 Show all vehicles
               </option>
-              <option value="2">Show busiest edges</option>
-              <option value="3">Show slowest vehicles</option>
+              <option value="1">Show busiest edges</option>
+              <option value="2">Show slowest vehicles</option>
             </select>
           </div>
           <div className="mb-4 card">
