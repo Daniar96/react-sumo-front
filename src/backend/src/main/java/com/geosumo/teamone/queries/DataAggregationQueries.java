@@ -62,14 +62,15 @@ public class DataAggregationQueries {
             "                    GROUP BY time_step" +
             "                    ORDER BY time_step) as data;";
 
-    public static final String SLOWEST_VEHICLE_PER_TIME_STEP = "SELECT coalesce(jsonb_agg(data), '[]') " +
-            "            FROM ( SELECT vehicle_id AS ID, speed " +
-            "            FROM output " +
-            "            WHERE sim_id = ? " +
-            "            AND time_step = ? " +
-            "            AND speed > 0" +
-            "            ORDER BY speed " +
-            "            LIMIT 10 ) AS data;";
+    public static final String SLOWEST_VEHICLE_PER_TIME_STEP = "" +
+            "SELECT coalesce(jsonb_agg(data), '[]')                         \n" +
+            "FROM ( SELECT vehicle_id AS ID, speed, ARRAY[x, y] AS coords   \n" +
+            "       FROM output                                             \n" +
+            "       WHERE sim_id = 1                                        \n" +
+            "       AND time_step = 300                                     \n" +
+            "       AND speed > 0                                           \n" +
+            "       ORDER BY speed                                          \n" +
+            "       LIMIT 10 ) AS data;                                     \n";
 
     public static final String BUSIEST_ROADS_PER_TIME_STEP =
             "SELECT jsonb_agg(data)\n" +
