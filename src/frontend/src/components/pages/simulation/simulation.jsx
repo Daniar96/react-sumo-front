@@ -73,11 +73,16 @@ export const SimulationPage = ({ match }) => {
   async function loadTimestep() {
     setLoadingTimestep(true);
 
-    const graphDynamic = await (
+    const [fGraphDynamic, fVehicles] = await Promise.all([
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`
-      )
-    ).json();
+      ),
+      await fetch(
+        `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`
+      ),
+    ]);
+
+    const graphDynamic = await fGraphDynamic.json();
     setTimestepGraph({
       slowest: graphDynamic.slowest.map((slowest) => [
         slowest.id.toString(),
@@ -108,13 +113,7 @@ export const SimulationPage = ({ match }) => {
           <b>Speed: </b>${slowest.speed}
         `,
       })),
-      all: (
-        await (
-          await fetch(
-            `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`
-          )
-        ).json()
-      )[0].vehicles.map((vehicle) => ({
+      all: (await fVehicles.json())[0].vehicles.map((vehicle) => ({
         icon_id: "vehicle_marker",
         icon_image:
           "<svg height='100' width='100'><circle cx='50' cy='50' r='40' stroke='black' stroke-width='3' fill='red' /></svg>",
@@ -144,18 +143,17 @@ export const SimulationPage = ({ match }) => {
     setTimestep(0);
     loadTimestep();
 
-    setMetadata(
-      await (
-        await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
-      ).json()
-    );
+    const [fMetadata, fNodes, fEdges, fGraphStatic] = await Promise.all([
+      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/edges`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`),
+    ]);
+
+    setMetadata(await fMetadata.json());
 
     setNodes(
-      (
-        await (
-          await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`)
-        ).json()
-      ).map((node) => ({
+      (await fNodes.json()).map((node) => ({
         lon: node.lon,
         lat: node.lat,
         visible: true,
@@ -169,11 +167,7 @@ export const SimulationPage = ({ match }) => {
     );
 
     setEdges(
-      (
-        await (
-          await fetch(`${API_BASE}/simulations/${match.params.id}/edges`)
-        ).json()
-      )
+      (await fEdges.json())
         .filter((edge) => edge.geometry !== null)
         .map((edge) => ({
           coords: edge.geometry.map((coord) =>
@@ -191,9 +185,7 @@ export const SimulationPage = ({ match }) => {
         }))
     );
 
-    const graphStatic = await (
-      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`)
-    ).json();
+    const graphStatic = await fGraphStatic.json();
     setVehiclesGraph({
       count: graphStatic.count.map((count) => [
         count.time_step,
