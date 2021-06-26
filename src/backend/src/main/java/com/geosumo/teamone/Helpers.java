@@ -8,7 +8,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.Arrays;
 
 import static com.geosumo.teamone.queries.DataInsertionQueries.*;
 import static com.geosumo.teamone.queries.DataCreationQueries.*;
@@ -16,8 +15,8 @@ import static com.geosumo.teamone.queries.DataCreationQueries.*;
 public class Helpers {
     private static final int CHUNK_LEN = 20_000_000;
     private static final String URL = "jdbc:postgresql://bronto.ewi.utwente.nl/";
-    private static final String USER = "dab_di20212b_167";
-    private static final String PASSWORD = "i449stWjyfgclDCm";
+    private static final String USER = "dab_pcsdb20211a_57";
+    private static final String PASSWORD = "JybJIj/xE116RuOZ";
     private static final String SCHEMA = "?currentSchema=geo_sumo";
     private static final Connection connection = connectToDB();
 
@@ -54,6 +53,28 @@ public class Helpers {
             } else {
                 return "[]";
             }
+        }
+    }
+    public static String getFromDatabasePrepared(String query, String stringParam) throws SQLException {
+
+        try (PreparedStatement pr = connection.prepareStatement(query)) {
+
+            pr.setString(1, stringParam);
+            ResultSet fin = pr.executeQuery();
+            if (fin.next()) {
+                return fin.getString(1);
+            } else {
+                return "{}";
+            }
+        }
+    }
+
+    public static void updateUser(String query, String email, byte[] password, byte[] salt) throws SQLException {
+        try (PreparedStatement pr = connection.prepareStatement(query)) {
+            pr.setString(1, email);
+            pr.setBytes(2, password);
+            pr.setBytes(3, salt);
+            pr.executeUpdate();
         }
     }
 
