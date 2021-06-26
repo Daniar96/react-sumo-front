@@ -113,7 +113,11 @@ public class DataCreationQueries {
             "\toutput TEXT,                                                             \n" +
             "\troutes TEXT,                                                             \n" +
             "\tedges  TEXT,                                                             \n" +
-            "\tnodes  TEXT );";
+            "\tnodes  TEXT );" +
+            "CREATE TABLE IF NOT EXISTS users (" +
+            "\tid SERIAL PRIMARY KEY,                                                   \n" +
+            "\temail TEXT NOT NULL UNIQUE,                                              \n" +
+            "\thashed_password VARCHAR NOT NULL, salt  VARCHAR );";
 
     public static final String DROP = "DROP TABLE IF EXISTS simulation CASCADE; " +
             "DROP TABLE IF EXISTS node CASCADE; " +

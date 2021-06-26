@@ -145,6 +145,9 @@ public class DataInsertionQueries {
             "SET name = ?, description = ?\n" +
             "WHERE id = ?;";
 
+
+    public static final String NEW_USER = "INSERT INTO users (email, hashedpassword, salt) VALUES (?, ?, ?) ;";
+
     public static String getInsertNode(int fileIndex) {
         return String.format(INSERT_NODE, fileIndex);
     }

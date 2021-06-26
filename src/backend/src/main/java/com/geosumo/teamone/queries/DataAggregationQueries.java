@@ -51,6 +51,31 @@ public class DataAggregationQueries {
                     " AND e.finish = nfin.node_id \n" +
                     " ORDER BY e.edge_id) AS ultimateData;";
 
+    public static final String GET_ALL_EDGES_WITH_COUNT = "" +
+            "SELECT jsonb_agg(ultimatedata)\n" +
+            "FROM(\n" +
+            "SELECT data.*, COUNT(out.sim_id) AS count\n" +
+            "FROM (\n" +
+            " SELECT e.edge_id AS id, e.start AS start, e.finish AS finish, \n" +
+            "        COALESCE(string_to_array(e.shape, ' '), string_to_array(CONCAT(CONCAT(nst.x,',',nst.y), ' ', CONCAT(nfin.x,',',nfin.y)),' ')) AS geometry ,\n" +
+            "        (nst.x+nfin.x)/2 as x, (nst.y+nfin.y)/2 as y                                         \n" +
+            " FROM node nst, edge e, node nfin \n" +
+            " WHERE e.sim_id  = ? \n" +
+            " AND nst.sim_id  = ? \n" +
+            " AND nfin.sim_id = ? \n" +
+            " AND e.start = nst.node_id \n" +
+            " AND e.finish = nfin.node_id \n" +
+            " ORDER BY e.edge_id ) AS data\n" +
+            "LEFT JOIN (\n" +
+            " SELECT *\n" +
+            " FROM output\n" +
+            " WHERE output.sim_id = ?  \n" +
+            " AND output.time_step = ? \n" +
+            ") AS out\n" +
+            "ON out.lane LIKE CONCAT(data.id, '$_%') ESCAPE '$'\n" +
+            "GROUP BY data.id, data.start, data.finish, data.geometry, data.x, data.y\n" +
+            "ORDER BY count DESC) AS ultimateData";
+
 
     public static final String VEHICLE_PER_TIME_STEP = "SELECT jsonb_agg(data) " +
             "            FROM ( SELECT time_step, count(*) AS vehicles " +
