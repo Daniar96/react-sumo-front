@@ -1,8 +1,8 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {loginUser, registerUser, useUserDispatch, useUserState} from '../../../contexts/userContext'
 
 export const LoginPage = (props) => {
-  const { loading } = useUserState()
+  const { loading, active } = useUserState()
   const dispatch = useUserDispatch()
 
   const [username, setUsername] = useState('')
@@ -14,6 +14,13 @@ export const LoginPage = (props) => {
 
   const [loginError, setLoginError] = useState(null)
   const [registerError, setRegisterError] = useState(null)
+
+  const [regBtnDisabled, setRegBtnDisabled] = useState(true)
+
+  // Automatic redirect to dashboard if already logged in
+  if (active) {
+    props.history.push('/dashboard')
+  }
 
   const submitLogin = async (e) => {
     e.preventDefault()
@@ -27,14 +34,29 @@ export const LoginPage = (props) => {
 
   const submitRegister = async (e) => {
     e.preventDefault()
-    const res = await registerUser(dispatch, {username: username, password: password})
+    const res = await registerUser(dispatch, {username: registerUsername, password: regPassword})
     if (res.username) {
       setUsername(res.username)
       setRegisterError("Registration successful")
+      setRegisterUsername('')
+      setRegPassword('')
+      setRegRepeatPassword('')
     } else if (res.error) {
       setRegisterError(res.error)
     }
   }
+
+  useEffect(() => {
+    setRegBtnDisabled(true)
+    if (regPassword.length < 6) {
+      setRegisterError('password too short')
+    } else if (regPassword !== regRepeatPassword) {
+      setRegisterError('passwords must match')
+    } else {
+      setRegisterError('')
+      setRegBtnDisabled(false)
+    }
+  }, [regPassword, regRepeatPassword])
 
   return (
     <div className="container my-4">
@@ -94,7 +116,7 @@ export const LoginPage = (props) => {
               <br/>
               {registerError ? <div>{registerError}</div> : null}
 
-              <button type="submit" className="btn btn-outline-primary" onClick={submitRegister}>Register</button>
+              <button disabled={regBtnDisabled} type="submit" className="btn btn-outline-primary" onClick={submitRegister}>Register</button>
 
             </form>
           </div>

@@ -15,12 +15,10 @@ export const loginUser = async (dispatch, payload) => {
     body: JSON.stringify(payload),
   })
     .then(res => {
-      if (res.status !== 200) {
-        throw "login failed"
-      }
       return res.json()
     })
     .then(data => {
+      if (data.error) { throw data.error }
       localStorage.setItem("user", data.username);
       localStorage.setItem("token", data.token);
       dispatch({
@@ -47,15 +45,13 @@ export const registerUser = async (dispatch, payload) => {
     body: JSON.stringify(payload),
   })
     .then(res => {
-      if (res.status !== 200) {
-        throw "Registration error"
-      }
       return res.json()
     })
     .then(data => {
       console.log(data)
+      if (data.error) { throw data.error }
       dispatch({type: 'REGISTER_SUCCESS', payload: {username: data.username}})
-      return {user: data.username}
+      return {username: data.username}
     })
     .catch(e => {
       dispatch({type: 'LOGIN_ERROR', payload: {error: e.toString()}})
