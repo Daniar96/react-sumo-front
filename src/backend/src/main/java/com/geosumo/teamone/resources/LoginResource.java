@@ -23,7 +23,8 @@ public class LoginResource {
 		try {
 			boolean authorised = SimulationDao.INSTANCE.checkUser(input.getUsername(), input.getPassword());
 			if (!authorised) {
-				return Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError("Wrong user credentials")).build();
+				return Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError("Wrong user credentials"))
+						.build();
 			} else {
 				UsernameWithToken ut = new UsernameWithToken(input.getUsername());
 				return Response.status(Response.Status.OK).entity(ut).build();
@@ -31,7 +32,7 @@ public class LoginResource {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ServerError("SQL error")).build();
-			
+
 		}
 
 	}
@@ -39,8 +40,21 @@ public class LoginResource {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void register(UserCredentials input) throws SQLException {
-		SimulationDao.INSTANCE.registerUser(input.getUsername(), input.getPassword());
-		// TODO
+	public Response register(UserCredentials input) {
+		try {
+			boolean registered = SimulationDao.INSTANCE.registerUser(input.getUsername(), input.getPassword());
+			if (registered) {
+				return Response.status(Response.Status.OK).entity(input).build();
+			} else {
+				return Response.status(Response.Status.CONFLICT).entity(new ServerError("The user is already registered")).build();
+
+			}
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ServerError("SQL error")).build();
+
+		}
+
 	}
 }

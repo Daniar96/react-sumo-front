@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
 
 @XmlRootElement
 public class ServerError {
-	@JsonRawValue
 	private String error;
 
 	public ServerError(String error) {
