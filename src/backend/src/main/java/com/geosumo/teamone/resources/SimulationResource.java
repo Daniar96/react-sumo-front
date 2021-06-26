@@ -51,8 +51,8 @@ public class SimulationResource {
     @Path("edges")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getEdges() throws SQLException {
-        return SimulationDao.INSTANCE.getEdgesJson(id);
+    public String getEdges(@QueryParam("timestep") int timestep) throws SQLException {
+        return SimulationDao.INSTANCE.getEdgesJson(id, timestep);
     }
 
     @Path("graphs/static")

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { SylvereyeRoadNetwork } from "react-sylvereye";
+import {
+  SylvereyeRoadNetwork,
+  EdgeAlphaMethod,
+  EdgeWidthMethod,
+} from "react-sylvereye";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { Link } from "../../../contexts/routerContext";
@@ -16,6 +20,7 @@ const tile_layer_opacity = 0.2;
 const marker_options = {
   ...SylvereyeRoadNetwork.defaultProps.marker_options,
   enable_tooltips: true,
+  enable_zoom_scaling: true,
 };
 
 export const SimulationPage = ({ match }) => {
@@ -37,12 +42,34 @@ export const SimulationPage = ({ match }) => {
     nodes: true,
     edges: true,
     markers: true,
+    alpha: false,
+    scale: false,
   });
   const [potentialMarkers, setPotentialMarkers] = useState({
     all: [],
     slow: [],
     busiest: [],
   });
+  const [edgeOptions, setEdgeOptions] = useState({
+    ...SylvereyeRoadNetwork.defaultProps.edge_options,
+    alpha_method: EdgeAlphaMethod.SCALE,
+    alpha_scale_field: "vehicles",
+    width_method: EdgeWidthMethod.SCALE,
+    width_scale_field: "vehicles",
+    alpha_min: 0.2,
+  });
+
+  useEffect(() => {
+    setEdgeOptions({
+      ...edgeOptions,
+      alpha_method: show.alpha
+        ? EdgeAlphaMethod.SCALE
+        : EdgeAlphaMethod.DEFAULT,
+      width_method: show.scale
+        ? EdgeWidthMethod.SCALE
+        : EdgeWidthMethod.DEFAULT,
+    });
+  }, [show.alpha, show.scale]);
 
   useEffect(() => {
     switch (show.markerType) {
@@ -56,8 +83,6 @@ export const SimulationPage = ({ match }) => {
         setMarkers(potentialMarkers.slow);
         break;
     }
-
-    console.log(show.markerType, markers, potentialMarkers);
   }, [potentialMarkers, show.markerType]);
 
   function deleteSimulation() {
@@ -73,12 +98,15 @@ export const SimulationPage = ({ match }) => {
   async function loadTimestep() {
     setLoadingTimestep(true);
 
-    const [fGraphDynamic, fVehicles] = await Promise.all([
+    const [fGraphDynamic, fVehicles, fEdges] = await Promise.all([
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`
       ),
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`
+      ),
+      await fetch(
+        `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}`
       ),
     ]);
 
@@ -152,19 +180,35 @@ export const SimulationPage = ({ match }) => {
       })),
     });
 
+    setEdges(
+      (await fEdges.json()).map((edge) => {
+        return {
+          coords: edge.geometry.map((coord) =>
+            coord.split(",").map(parseFloat).reverse()
+          ),
+          visible: true,
+          alpha: 1.0,
+          width: 0.25,
+          color: 26262,
+          data: {
+            vehicles: edge.count,
+            id: edge.id,
+            start: edge.start,
+            finish: edge.finish,
+          },
+        };
+      })
+    );
+
     setLoadingTimestep(false);
   }
 
   useEffect(async () => {
     setLoading(true);
 
-    setTimestep(0);
-    loadTimestep();
-
-    const [fMetadata, fNodes, fEdges, fGraphStatic] = await Promise.all([
+    const [fMetadata, fNodes, fGraphStatic] = await Promise.all([
       await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`),
       await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/edges`),
       await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`),
     ]);
 
@@ -184,25 +228,6 @@ export const SimulationPage = ({ match }) => {
       }))
     );
 
-    setEdges(
-      (await fEdges.json())
-        .filter((edge) => edge.geometry !== null)
-        .map((edge) => ({
-          coords: edge.geometry.map((coord) =>
-            coord.split(",").map(parseFloat).reverse()
-          ),
-          visible: true,
-          alpha: 1.0,
-          width: 0.25,
-          color: 26262,
-          data: {
-            id: edge.id,
-            start: edge.start,
-            finish: edge.finish,
-          },
-        }))
-    );
-
     const graphStatic = await fGraphStatic.json();
     setVehiclesGraph({
       count: graphStatic.count.map((count) => [
@@ -214,6 +239,9 @@ export const SimulationPage = ({ match }) => {
         speed.averagespeed,
       ]),
     });
+
+    setTimestep(0);
+    loadTimestep();
 
     setLoading(false);
   }, [match.params.id]);
@@ -287,6 +315,34 @@ export const SimulationPage = ({ match }) => {
                   Show markers
                 </label>
               </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="show-alpha"
+                  checked={show.alpha}
+                  onChange={(e) =>
+                    setShow({ ...show, alpha: e.target.checked })
+                  }
+                />
+                <label class="form-check-label" for="show-alpha">
+                  Edge busyness by alpha
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="show-scale"
+                  checked={show.scale}
+                  onChange={(e) =>
+                    setShow({ ...show, scale: e.target.checked })
+                  }
+                />
+                <label class="form-check-label" for="show-scale">
+                  Edge busyness by scale
+                </label>
+              </div>
             </div>
             <select
               class="form-select"
@@ -308,6 +364,7 @@ export const SimulationPage = ({ match }) => {
               nodes_data={nodes}
               markers_data={markers}
               marker_options={marker_options}
+              edge_options={edgeOptions}
               map_center={[nodes[0].lat, nodes[0].lon]}
               map_zoom={map_zoom}
               map_style={map_style}

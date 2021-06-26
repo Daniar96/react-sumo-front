@@ -20,7 +20,7 @@ public class Helpers {
     private static final String SCHEMA = "?currentSchema=geo_sumo";
     private static final Connection connection = connectToDB();
 
-    public static void processFiles(String simulationName, String simulationDesc, String... files) throws SQLException, NullPointerException {
+    public synchronized static void processFiles(String simulationName, String simulationDesc, String... files) throws SQLException, NullPointerException {
         try {
             // Insert the raw data into the database
             int fileIndex = sendFiles(files);
@@ -40,7 +40,7 @@ public class Helpers {
      * @param query sql query to execute
      * @param param parameters for the query
      */
-    public static String getFromDatabasePrepared(String query, int... param) throws SQLException {
+    public synchronized static String getFromDatabasePrepared(String query, int... param) throws SQLException {
 
         try (PreparedStatement pr = connection.prepareStatement(query)) {
             for (int i = 0; i < param.length; i++) {

@@ -16,8 +16,8 @@ import UploadPage from "./components/pages/upload";
 import { UserProvider, useUserState } from "./contexts/userContext";
 
 const ProtectedRoute = ({ props }) => {
-  const { active } = useUserState();
-  return <>{active ? <Route {...props} /> : <Redirect to={"/login"} />}</>;
+  const { token, user } = useUserState();
+  return <>{token && user? <Route {...props} /> : <Redirect to={"/login"} />}</>;
 };
 
 function App() {

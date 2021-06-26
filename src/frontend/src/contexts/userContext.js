@@ -6,7 +6,6 @@ const initialLogin = {
   token: localStorage.getItem("token"),
   loading: false,
   errorMessage: null,
-  active: false,
 };
 
 export const loginUser = async (dispatch, payload) => {
@@ -19,7 +18,7 @@ export const loginUser = async (dispatch, payload) => {
       body: JSON.stringify(payload),
     });
 
-    if (res.status === 200) {
+    if (res.status === 200 && res.data) {
       localStorage.setItem("user", res.data.user);
       localStorage.setItem("token", res.data.token);
       dispatch({
@@ -40,27 +39,28 @@ export const loginUser = async (dispatch, payload) => {
   }
 };
 
-// export const registerUser = async (dispatch, payload) => {
-//   try {
-//     dispatch({type: 'REGISTER'})
-//     const res = await axios.post(`${API_BASE}/register`, payload, {
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//     })
-//     console.log(res)
-//     if (res.data && res.status === 200 && res.data.status === 200) {
-//       dispatch({type: 'REGISTER_SUCCESS', payload: { email: res.data.data}})
-//       return { email: res.data.data }
-//     } else if (res.data && res.data.status === 500) {
-//       dispatch({type: 'LOGIN_ERROR', payload: {error: res.data.error}})
-//       return { error: res.data.error }
-//     }
-//   } catch (error) {
-//     dispatch( {type: 'LOGIN_ERROR', payload: { error: error.toString()}})
-//     return { error: error.toString()}
-//   }
-// }
+export const registerUser = async (dispatch, payload) => {
+  try {
+    dispatch({type: 'REGISTER'})
+
+    const res = await fetch(`${API_BASE}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.data && res.status === 200) {
+      dispatch({type: 'REGISTER_SUCCESS', payload: { user: res.data.data}})
+      return { user: res.data.data }
+    } else {
+      dispatch({type: 'LOGIN_ERROR', payload: {error: res.data.error}})
+      return { error: res.data.error }
+    }
+  } catch (error) {
+    dispatch( {type: 'LOGIN_ERROR', payload: { error: error.toString()}})
+    return { error: error.toString()}
+  }
+}
 
 export const logout = (dispatch) => {
   localStorage.removeItem("token");
@@ -83,10 +83,10 @@ const userAuthReducer = (initial, action) => {
   switch (action.type) {
     case "LOGIN":
       return { ...initial, loading: true };
-    // case "REGISTER":
-    //   return { ...initial, loading: true }
-    // case "REGISTER_SUCCESS":
-    //   return { ...initial, email: action.payload.email, loading: false }
+    case "REGISTER":
+       return { ...initial, loading: true }
+    case "REGISTER_SUCCESS":
+       return { ...initial, user: action.payload.user, loading: false }
     case "LOGIN_SUCCESS":
       return { ...initial, user: action.payload.user, loading: false };
     case "LOGOUT":

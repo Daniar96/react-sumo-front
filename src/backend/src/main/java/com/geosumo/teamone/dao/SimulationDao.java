@@ -30,7 +30,7 @@ public enum SimulationDao {
 		return getFromDatabasePrepared(GET_SIMULATIONS);
 	}
 
-	public String getMetadataJson(int id) throws SQLException {
+	public synchronized String getMetadataJson(int id) throws SQLException {
 		return getFromDatabasePrepared(GET_SIMULATION_BY_ID, id, id);
 	}
 
