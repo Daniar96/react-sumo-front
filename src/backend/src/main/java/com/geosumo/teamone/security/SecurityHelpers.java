@@ -54,7 +54,6 @@ public class SecurityHelpers {
 			byte[] hashedPasswordStrored = hexStringToByteArray(hashPswrdHexStr);
 			return Arrays.equals(hashedPasswordTocheck, hashedPasswordStrored);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

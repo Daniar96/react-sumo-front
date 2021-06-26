@@ -4,8 +4,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
+@XmlRootElement
 public class UsernameWithToken {
+	@JsonRawValue
 	String username;
+	@JsonRawValue
 	byte[] token;
 
 	public String getUsername() {
