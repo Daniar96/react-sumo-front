@@ -113,6 +113,24 @@ export const SimulationPage = ({ match }) => {
           <b>Speed: </b>${slowest.speed}
         `,
       })),
+      busiest: graphDynamic.busiest.map((busiest) => ({
+        icon_id: "vehicle_marker",
+        icon_image:
+          "<svg height='100' width='100'><circle cx='50' cy='50' r='40' stroke='black' stroke-width='3' fill='red' /></svg>",
+        lon: busiest.x,
+        lat: busiest.y,
+        color: 0x066cc,
+        visible: true,
+        alpha: 1.0,
+        size: 0.25,
+        size_scale_min: 0.25,
+        size_scale_max: 0.5,
+        data: busiest,
+        tooltip: `
+          <b>ID: </b>${busiest.edge_id}<br/>
+          <b>Number of vehicles: </b>${busiest.count}
+        `,
+      })),
       all: (await fVehicles.json())[0].vehicles.map((vehicle) => ({
         icon_id: "vehicle_marker",
         icon_image:
