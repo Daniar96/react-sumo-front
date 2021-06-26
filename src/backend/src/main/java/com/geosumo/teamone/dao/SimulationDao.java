@@ -42,9 +42,10 @@ public enum SimulationDao {
 		return getFromDatabasePrepared(GET_ALL_NODES, id);
 	}
 
-	public String getEdgesJson(int id) throws SQLException {
-		return getFromDatabasePrepared(GET_ALL_EDGES, id, id, id);
-	}
+	public String getEdgesJson(int id, int timestep) throws SQLException {
+        return getFromDatabasePrepared(GET_ALL_EDGES_WITH_COUNT, id, id, id, id, timestep);
+    }
+
 
 	public StaticGraphs getStaticGraphs(int id) throws SQLException {
 		return new StaticGraphs(getFromDatabasePrepared(VEHICLE_PER_TIME_STEP, id),
