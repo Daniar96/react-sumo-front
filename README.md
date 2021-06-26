@@ -24,7 +24,7 @@ yarn start
 
 A browser should automatically open to the right page.
 
-To build for production
+#### To build for production
 
 Navigate to `src/frontend/sylvereye` folder
 ```bash

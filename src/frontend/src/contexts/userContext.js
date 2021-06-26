@@ -1,78 +1,81 @@
-import { createContext, useContext, useReducer } from "react";
-import { API_BASE } from "../util";
+import {createContext, useContext, useReducer} from "react";
+import {API_BASE} from "../util";
 
 const initialLogin = {
   user: localStorage.getItem("user"),
   token: localStorage.getItem("token"),
   loading: false,
-  errorMessage: null,
 };
 
 export const loginUser = async (dispatch, payload) => {
-  try {
-    dispatch({ type: "LOGIN" });
-
-    const res = await fetch(`${API_BASE}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (res.status === 200 && res.data) {
-      localStorage.setItem("user", res.data.user);
-      localStorage.setItem("token", res.data.token);
+  dispatch({type: "LOGIN"});
+  return await fetch(`${API_BASE}/login`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload),
+  })
+    .then(res => {
+      if (res.status !== 200) {
+        throw "login failed"
+      }
+      return res.json()
+    })
+    .then(data => {
+      localStorage.setItem("user", data.username);
+      localStorage.setItem("token", data.token);
       dispatch({
         type: "LOGIN_SUCCESS",
         payload: {
-          user: res.data.user,
-          token: res.data.token,
+          user: data.username,
+          token: data.token,
         },
       });
-      return { user: res.data.user };
-    } else {
-      dispatch({ type: "LOGIN_ERROR", payload: { error: res.data.error } });
-      return { error: res.data.error };
-    }
-  } catch (error) {
-    dispatch({ type: "LOGIN_ERROR", payload: { error: error.toString() } });
-    return { error: error.toString() };
-  }
+      return {username: data.username};
+    })
+    .catch(e => {
+      dispatch({type: "LOGIN_ERROR", error: e});
+      return {error: e.toString()}
+    })
 };
 
 export const registerUser = async (dispatch, payload) => {
-  try {
-    dispatch({type: 'REGISTER'})
+  dispatch({type: 'REGISTER'})
 
-    const res = await fetch(`${API_BASE}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (res.data && res.status === 200) {
-      dispatch({type: 'REGISTER_SUCCESS', payload: { user: res.data.data}})
-      return { user: res.data.data }
-    } else {
-      dispatch({type: 'LOGIN_ERROR', payload: {error: res.data.error}})
-      return { error: res.data.error }
-    }
-  } catch (error) {
-    dispatch( {type: 'LOGIN_ERROR', payload: { error: error.toString()}})
-    return { error: error.toString()}
-  }
+  return await fetch(`${API_BASE}/login`, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "true"},
+    body: JSON.stringify(payload),
+  })
+    .then(res => {
+      if (res.status !== 200) {
+        throw "Registration error"
+      }
+      return res.json()
+    })
+    .then(data => {
+      console.log(data)
+      dispatch({type: 'REGISTER_SUCCESS', payload: {username: data.username}})
+      return {user: data.username}
+    })
+    .catch(e => {
+      dispatch({type: 'LOGIN_ERROR', payload: {error: e.toString()}})
+      return {error: e.toString()}
+    })
 }
 
 export const logout = (dispatch) => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  dispatch({ type: "LOGOUT" });
+  dispatch({type: "LOGOUT"});
 };
 
 export const UserContext = createContext(initialLogin);
 export const UserDispatchContext = createContext();
 
 export const useUserState = () => {
-  return useContext(UserContext);
+  const userState = useContext(UserContext)
+  userState.active = userState.token !== null && userState.user !== null
+  return userState;
 };
 
 export const useUserDispatch = () => {
@@ -82,23 +85,23 @@ export const useUserDispatch = () => {
 const userAuthReducer = (initial, action) => {
   switch (action.type) {
     case "LOGIN":
-      return { ...initial, loading: true };
+      return {...initial, loading: true};
     case "REGISTER":
-       return { ...initial, loading: true }
+      return {...initial, loading: true}
     case "REGISTER_SUCCESS":
-       return { ...initial, user: action.payload.user, loading: false }
+      return {...initial, loading: false}
     case "LOGIN_SUCCESS":
-      return { ...initial, user: action.payload.user, loading: false };
+      return {...initial, user: action.payload.user, token: action.payload.token, loading: false};
     case "LOGOUT":
-      return { ...initial, user: null };
+      return {...initial, user: null, token: null};
     case "LOGIN_ERROR":
-      return { ...initial, loading: false, errorMessage: action.payload.error };
+      return {...initial, loading: false};
     default:
       throw new Error("Unhandled action type: " + action.type);
   }
 };
 
-export const UserProvider = ({ children }) => {
+export const UserProvider = ({children}) => {
   const [user, dispatch] = useReducer(userAuthReducer, initialLogin);
 
   return (

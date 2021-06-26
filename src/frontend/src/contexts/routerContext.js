@@ -64,14 +64,10 @@ export const Switch = ({ children }) => {
 
   const toRender = (nav, currentPath) =>
     children.map((child) => {
-      if (child.type !== Route) {
-        return child;
-      } else {
-        const match = routeMatches(currentPath, child.props.path);
-        return match.matched
-          ? cloneElement(child, { path: child.props.path, match: match, history: {push: nav}})
-          : null;
-      }
+      const match = routeMatches(currentPath, child.props.path);
+      return match.matched
+        ? cloneElement(child, { path: child.props.path, match: match, history: {push: nav}})
+        : null;
     })
 
   return (
@@ -81,8 +77,8 @@ export const Switch = ({ children }) => {
   );
 };
 
-export const Route = ({ component: Component, ...rest}) => {
-  return <Component {...rest} />;
+export const Route = ({ component: Component, children, ...rest}) => {
+  return Component === undefined ? <>{children}</> : <Component {...rest} />;
 };
 
 export const Link = ({ children, to, ...props }) => {
@@ -109,7 +105,7 @@ export const Link = ({ children, to, ...props }) => {
 export const Redirect = ({ to }) => {
   return (
     <RouterContext.Consumer>
-      {({ navigate }) => navigate({ to })}
+      {({ navigate }) => navigate(to)}
     </RouterContext.Consumer>
   );
 };

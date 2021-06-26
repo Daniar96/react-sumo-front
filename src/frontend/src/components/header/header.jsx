@@ -2,7 +2,7 @@ import "./header.css";
 import {useUserDispatch, useUserState, logout} from "../../contexts/userContext";
 
 export const Header = () => {
-  const { user, token } = useUserState()
+  const { user, active } = useUserState()
   const dispatch = useUserDispatch()
 
   const logoutPressed = () => {
@@ -15,7 +15,7 @@ export const Header = () => {
         <div className="navbar-nav">
           <span className="navbar-brand">CentreGeo SUMO</span>
         </div>
-        { user && token ?
+        { active ?
           <ul className="nav navbar-nav navbar-right">
             <li className="nav-item">
               <a href="#" className="nav-link">

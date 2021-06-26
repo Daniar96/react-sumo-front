@@ -1,8 +1,8 @@
 import {useState} from 'react'
-import {loginUser, useUserDispatch, useUserState} from '../../../contexts/userContext'
+import {loginUser, registerUser, useUserDispatch, useUserState} from '../../../contexts/userContext'
 
 export const LoginPage = (props) => {
-  const {loading} = useUserState()
+  const { loading } = useUserState()
   const dispatch = useUserDispatch()
 
   const [username, setUsername] = useState('')
@@ -17,8 +17,8 @@ export const LoginPage = (props) => {
 
   const submitLogin = async (e) => {
     e.preventDefault()
-    const res = await loginUser(dispatch, {user: username, password: password})
-    if (res.user) {
+    const res = await loginUser(dispatch, {username: username, password: password})
+    if (res.username) {
       props.history.push('/dashboard')
     } else if (res.error) {
       setLoginError(res.error)
@@ -27,9 +27,10 @@ export const LoginPage = (props) => {
 
   const submitRegister = async (e) => {
     e.preventDefault()
-    const res = await loginUser(dispatch, {user: username, password: password})
-    if (res.user) {
-
+    const res = await registerUser(dispatch, {username: username, password: password})
+    if (res.username) {
+      setUsername(res.username)
+      setRegisterError("Registration successful")
     } else if (res.error) {
       setRegisterError(res.error)
     }
