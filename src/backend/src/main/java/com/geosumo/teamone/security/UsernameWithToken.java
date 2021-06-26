@@ -4,6 +4,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
+
 public class UsernameWithToken {
 	String username;
 	byte[] token;
@@ -16,8 +17,8 @@ public class UsernameWithToken {
 		this.username = username;
 	}
 
-	public byte[] getToken() {
-		return token;
+	public String getToken() {
+		return new String(token);
 	}
 
 	public void setToken(byte[] token) {

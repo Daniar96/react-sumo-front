@@ -14,27 +14,26 @@ import java.util.zip.ZipInputStream;
 
 @Path("/simulations")
 public class SimulationsResource {
-    @Context
-    private UriInfo uriInfo;
-    @Context
-    private Request request;
+	@Context
+	private UriInfo uriInfo;
+	@Context
+	private Request request;
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getSimulations() throws SQLException {
-        return SimulationDao.INSTANCE.getListJson();
-    }
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getSimulations() throws SQLException {
+		return SimulationDao.INSTANCE.getListJson();
+	}
 
-    @Path("{simulation_id}")
-    public SimulationResource getSimulation(@PathParam("simulation_id") int id) {
-        return new SimulationResource(uriInfo, request, id);
-    }
+	@Path("{simulation_id}")
+	public SimulationResource getSimulation(@PathParam("simulation_id") int id) {
+		return new SimulationResource(uriInfo, request, id);
+	}
 
-    @POST
-    @Consumes("application/zip")
-    public void uploadSimulation(@QueryParam("name") String name,
-                                 @QueryParam("description") String description,
-                                 InputStream input) throws IOException, SQLException {
-        SimulationDao.INSTANCE.createNewZipFile(name, description, new ZipInputStream(input));
-    }
+	@POST
+	@Consumes("application/zip")
+	public void uploadSimulation(@QueryParam("name") String name, @QueryParam("description") String description,
+			InputStream input) throws IOException, SQLException {
+		SimulationDao.INSTANCE.createNewZipFile(name, description, new ZipInputStream(input));
+	}
 }

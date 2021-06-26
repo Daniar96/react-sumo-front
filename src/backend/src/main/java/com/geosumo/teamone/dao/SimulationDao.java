@@ -43,9 +43,8 @@ public enum SimulationDao {
 	}
 
 	public String getEdgesJson(int id, int timestep) throws SQLException {
-        return getFromDatabasePrepared(GET_ALL_EDGES_WITH_COUNT, id, id, id, id, timestep);
-    }
-
+		return getFromDatabasePrepared(GET_ALL_EDGES_WITH_COUNT, id, id, id, id, timestep);
+	}
 
 	public StaticGraphs getStaticGraphs(int id) throws SQLException {
 		return new StaticGraphs(getFromDatabasePrepared(VEHICLE_PER_TIME_STEP, id),
@@ -81,11 +80,18 @@ public enum SimulationDao {
 
 	}
 
-	public void registerUser(String userName, String passwordString) throws SQLException {
-		byte[][] hashWithSalt = hashSaltFromPassword(passwordString);
-		// Update database
-		updateUser(INSERT_USER, userName, hashWithSalt[0], hashWithSalt[1]);
-		//TODO
+	public boolean registerUser(String userName, String passwordString) throws SQLException {
+		// Check if a user is in a database
+		String user = getFromDatabasePrepared(GET_USER, userName);
+		if (!user.equals("{}")) {
+			return false;
+
+		} else {
+			byte[][] hashWithSalt = hashSaltFromPassword(passwordString);
+			// Update database
+			updateUser(INSERT_USER, userName, hashWithSalt[0], hashWithSalt[1]);
+			return true;
+		}
 	}
 
 	public void createNewZipFile(String name, String description, ZipInputStream input)

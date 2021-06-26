@@ -16,6 +16,7 @@ public class SecurityHelpers {
 		}
 		return data;
 	}
+
 	public static byte[][] hashSaltFromPassword(String passwordString) {
 		try {
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -31,7 +32,7 @@ public class SecurityHelpers {
 			toReturn[0] = messageDigest.digest();
 			toReturn[1] = salt;
 			return toReturn;
-			
+
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			return null;
@@ -39,7 +40,7 @@ public class SecurityHelpers {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 	}
 
 	public static boolean passwordsEqual(String plainPassword, String saltHexStr, String hashPswrdHexStr) {
@@ -54,7 +55,6 @@ public class SecurityHelpers {
 			byte[] hashedPasswordStrored = hexStringToByteArray(hashPswrdHexStr);
 			return Arrays.equals(hashedPasswordTocheck, hashedPasswordStrored);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

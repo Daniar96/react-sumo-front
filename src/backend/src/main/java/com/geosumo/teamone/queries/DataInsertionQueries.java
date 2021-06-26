@@ -95,8 +95,7 @@ public class DataInsertionQueries {
 		return String.format(INSERT_NODE, fileIndex);
 	}
 
-
-    public static final String NEW_USER = "INSERT INTO users (email, hashedpassword, salt) VALUES (?, ?, ?) ;";
+	public static final String NEW_USER = "INSERT INTO users (email, hashedpassword, salt) VALUES (?, ?, ?) ;";
 
 	public static String getInsertEdge(int fileIndex) {
 		return String.format(INSERT_EDGE, fileIndex);
