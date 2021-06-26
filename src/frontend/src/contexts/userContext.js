@@ -43,7 +43,7 @@ export const registerUser = async (dispatch, payload) => {
 
   return await fetch(`${API_BASE}/login`, {
     method: "PUT",
-    headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "true"},
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify(payload),
   })
     .then(res => {
