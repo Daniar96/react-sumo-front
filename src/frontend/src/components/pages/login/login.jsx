@@ -1,22 +1,38 @@
-import { useState } from 'react'
-import { loginUser, useUserDispatch, useUserState } from '../../../contexts/userContext'
+import {useState} from 'react'
+import {loginUser, useUserDispatch, useUserState} from '../../../contexts/userContext'
 
 export const LoginPage = (props) => {
-  const { loading, active } = useUserState()
+  const {loading} = useUserState()
   const dispatch = useUserDispatch()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  console.log(props)
+  const [registerUsername, setRegisterUsername] = useState('')
+  const [regPassword, setRegPassword] = useState('')
+  const [regRepeatPassword, setRegRepeatPassword] = useState('')
+
+  const [loginError, setLoginError] = useState(null)
+  const [registerError, setRegisterError] = useState(null)
 
   const submitLogin = async (e) => {
     e.preventDefault()
     const res = await loginUser(dispatch, {user: username, password: password})
     if (res.user) {
-
+      props.history.push('/dashboard')
+    } else if (res.error) {
+      setLoginError(res.error)
     }
-    props.history.push('/dashboard')
+  }
+
+  const submitRegister = async (e) => {
+    e.preventDefault()
+    const res = await loginUser(dispatch, {user: username, password: password})
+    if (res.user) {
+
+    } else if (res.error) {
+      setRegisterError(res.error)
+    }
   }
 
   return (
@@ -30,7 +46,7 @@ export const LoginPage = (props) => {
           <div className="rounded-5 shadow p-3 mb-5 bg-body rounded">
             <form>
               <div className="mb-3">
-                <label htmlFor="login" className="form-label">Username/ Email address</label>
+                <label htmlFor="login" className="form-label">Email address</label>
                 <input type="email" className="form-control" id="login" value={username}
                        onChange={e => setUsername(e.target.value)}/>
 
@@ -43,7 +59,8 @@ export const LoginPage = (props) => {
               <div className="form-text"><a href="#">Forgot password?</a></div>
 
               <br/>
-              { loading ?
+              {loginError ? <div>{loginError}</div> : null}
+              {loading ?
                 <div>loading</div>
                 :
                 <button type="submit" className="btn btn-outline-primary" onClick={submitLogin}>Login</button>
@@ -57,25 +74,26 @@ export const LoginPage = (props) => {
           <div className="rounded-5 shadow p-3 mb-5 bg-body rounded">
             <form>
               <div className="mb-3">
-                <label htmlFor="regUsername" className="form-label">Username</label>
-                <input type="username" className="form-control" id="regUsername"/>
-              </div>
-              <div className="mb-3">
                 <label htmlFor="regEmail" className="form-label">Email address</label>
-                <input type="email" className="form-control" id="regEmail"/>
+                <input value={registerUsername} type="email" className="form-control" id="regEmail"
+                       onChange={e => setRegisterUsername(e.target.value)}/>
               </div>
               <div className="mb-3">
                 <label htmlFor="regPassword" className="form-label">Password</label>
-                <input type="password" className="form-control" id="regPassword"/>
+                <input value={regPassword} type="password" className="form-control" id="regPassword"
+                       onChange={e => setRegPassword(e.target.value)}/>
               </div>
               <div className="mb-3">
                 <label htmlFor="regRepeatPassword" className="form-label">Repeat Password</label>
-                <input type="password" className="form-control" id="regRepeatPassword"/>
+                <input value={regRepeatPassword} type="password" className="form-control" id="regRepeatPassword"
+                       onChange={e => setRegRepeatPassword(e.target.value)}/>
               </div>
 
 
               <br/>
-              <button type="submit" className="btn btn-outline-primary">Register</button>
+              {registerError ? <div>{registerError}</div> : null}
+
+              <button type="submit" className="btn btn-outline-primary" onClick={submitRegister}>Register</button>
 
             </form>
           </div>

@@ -6,7 +6,6 @@ const initialLogin = {
   token: localStorage.getItem("token"),
   loading: false,
   errorMessage: null,
-  active: false,
 };
 
 export const loginUser = async (dispatch, payload) => {
@@ -19,7 +18,7 @@ export const loginUser = async (dispatch, payload) => {
       body: JSON.stringify(payload),
     });
 
-    if (res.status === 200) {
+    if (res.status === 200 && res.data) {
       localStorage.setItem("user", res.data.user);
       localStorage.setItem("token", res.data.token);
       dispatch({
@@ -51,8 +50,8 @@ export const registerUser = async (dispatch, payload) => {
     });
 
     if (res.data && res.status === 200) {
-      dispatch({type: 'REGISTER_SUCCESS', payload: { email: res.data.data}})
-      return { email: res.data.data }
+      dispatch({type: 'REGISTER_SUCCESS', payload: { user: res.data.data}})
+      return { user: res.data.data }
     } else {
       dispatch({type: 'LOGIN_ERROR', payload: {error: res.data.error}})
       return { error: res.data.error }
