@@ -2,9 +2,7 @@ package com.geosumo.teamone.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
 
-@XmlRootElement
 public class ServerError {
 	private String error;
 

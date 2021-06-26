@@ -46,7 +46,8 @@ public class LoginResource {
 			if (registered) {
 				return Response.status(Response.Status.OK).entity(input).build();
 			} else {
-				return Response.status(Response.Status.CONFLICT).entity(new ServerError("The user is already registered")).build();
+				return Response.status(Response.Status.CONFLICT)
+						.entity(new ServerError("The user is already registered")).build();
 
 			}
 		} catch (SQLException e) {

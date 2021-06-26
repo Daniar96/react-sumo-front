@@ -6,33 +6,33 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class StaticGraphs {
-    @JsonRawValue
-    private String count;
+	@JsonRawValue
+	private String count;
 
-    @JsonRawValue
-    private String speed;
+	@JsonRawValue
+	private String speed;
 
-    public StaticGraphs() {
-    }
+	public StaticGraphs() {
+	}
 
-    public StaticGraphs(String count, String speed) {
-        this.count = count;
-        this.speed = speed;
-    }
+	public StaticGraphs(String count, String speed) {
+		this.count = count;
+		this.speed = speed;
+	}
 
-    public String getCount() {
-        return count;
-    }
+	public String getCount() {
+		return count;
+	}
 
-    public void setCount(String count) {
-        this.count = count;
-    }
+	public void setCount(String count) {
+		this.count = count;
+	}
 
-    public String getSpeed() {
-        return speed;
-    }
+	public String getSpeed() {
+		return speed;
+	}
 
-    public void setSpeed(String speed) {
-        this.speed = speed;
-    }
+	public void setSpeed(String speed) {
+		this.speed = speed;
+	}
 }

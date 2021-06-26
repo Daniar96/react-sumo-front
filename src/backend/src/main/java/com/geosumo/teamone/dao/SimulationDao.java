@@ -85,7 +85,7 @@ public enum SimulationDao {
 		String user = getFromDatabasePrepared(GET_USER, userName);
 		if (!user.equals("{}")) {
 			return false;
-			
+
 		} else {
 			byte[][] hashWithSalt = hashSaltFromPassword(passwordString);
 			// Update database
