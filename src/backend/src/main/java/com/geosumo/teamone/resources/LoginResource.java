@@ -22,7 +22,6 @@ public class LoginResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response login(UserCredentials input) {
 		try {
-			System.out.println("LOGIN");
 			boolean authorised = SimulationDao.INSTANCE.checkUser(input.getUsername(), input.getPassword());
 			if (!authorised) {
 				return Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError("Wrong user credentials"))

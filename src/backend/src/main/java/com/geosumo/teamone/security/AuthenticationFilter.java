@@ -24,14 +24,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 		// Get the Authorization header from the request
 		String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		
 		// Validate the Authorization header
 		if (!isValidHeader(authorizationHeader)) {
 			abortWithUnauthorized(requestContext);
 			return;
 		}
 		String token = authorizationHeader.substring(AUTHENTICATION_HEADER.length()).trim();
-		System.out.println("Recieved token: " + token);
 		try {
 			// Validate the token
 			validateToken(token);
@@ -49,13 +47,11 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
 	private void abortWithUnauthorized(ContainerRequestContext requestContext) {
 		// Abort with 401 error and error message
-		System.out.println("Return 401");
 		requestContext.abortWith(
 				Response.status(Response.Status.UNAUTHORIZED).entity(new ServerError("Ivalid/expired token")).build());
 	}
 
 	private void validateToken(String token) throws Exception {
-		System.out.println("Validation");
 		TokenList.print();
 		// Throw an Exception if the token is invalid
 		if (!TokenList.validToken(token)) {

@@ -9,7 +9,6 @@ public class TokenList {
 
 	public static void addToken(String token) {
 		lock.lock();
-		System.out.println("Adding token");
 		tokens.add(token);
 		lock.unlock();
 	}
