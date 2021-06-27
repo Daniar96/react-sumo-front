@@ -14,6 +14,7 @@ import SimulationPage from "./components/pages/simulation";
 import EditPage from "./components/pages/edit";
 import UploadPage from "./components/pages/upload";
 import { UserProvider, useUserState } from "./contexts/userContext";
+import { SUBPATH } from './util'
 
 const ProtectedRoute = ({ ...rest }) => {
   const { active } = useUserState();
@@ -24,7 +25,7 @@ function App() {
   return (
     <div className="App">
       <UserProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={SUBPATH}>
           <Header />
 
           <main>

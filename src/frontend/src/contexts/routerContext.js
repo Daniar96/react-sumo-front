@@ -1,16 +1,18 @@
 import {
   cloneElement,
   createContext,
-  useContext,
   useEffect,
   useState,
 } from "react";
+import { SUBPATH } from '../util'
 
 const initialState = {
   path: window.location.pathname,
 };
 
 export const RouterContext = createContext(initialState);
+
+const base_url = SUBPATH
 
 export const BrowserRouter = ({ children }) => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -24,8 +26,8 @@ export const BrowserRouter = ({ children }) => {
   }, []);
 
   const navigate = (url) => {
-    setCurrentPath(url);
-    window.history.pushState(null, null, url);
+    setCurrentPath(base_url + url);
+    window.history.pushState(null, null, base_url + url);
   };
 
   return (
@@ -64,7 +66,7 @@ export const Switch = ({ children }) => {
 
   const toRender = (nav, currentPath) =>
     children.map((child) => {
-      const match = routeMatches(currentPath, child.props.path);
+      const match = routeMatches(currentPath, base_url + child.props.path);
       return match.matched
         ? cloneElement(child, { path: child.props.path, match: match, history: {push: nav}})
         : null;
