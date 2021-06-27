@@ -95,20 +95,20 @@ export const LoginPage = (props) => {
         <div className="col-md-5 offset-md-1 ">
           <h2 className="text-left mb-4 px-3">Create an account</h2>
           <div className="rounded-5 shadow p-3 mb-5 bg-body rounded">
-            <form>
+            <form autoComplete="off">
               <div className="mb-3">
                 <label htmlFor="regEmail" className="form-label">Email address</label>
-                <input value={registerUsername} type="email" className="form-control" id="regEmail"
+                <input autoComplete="off" value={registerUsername} type="email" className="form-control" id="regEmail"
                        onChange={e => setRegisterUsername(e.target.value)}/>
               </div>
               <div className="mb-3">
                 <label htmlFor="regPassword" className="form-label">Password</label>
-                <input value={regPassword} type="password" className="form-control" id="regPassword"
+                <input autoComplete="off" value={regPassword} type="password" className="form-control" id="regPassword"
                        onChange={e => setRegPassword(e.target.value)}/>
               </div>
               <div className="mb-3">
                 <label htmlFor="regRepeatPassword" className="form-label">Repeat Password</label>
-                <input value={regRepeatPassword} type="password" className="form-control" id="regRepeatPassword"
+                <input autoComplete="off" value={regRepeatPassword} type="password" className="form-control" id="regRepeatPassword"
                        onChange={e => setRegRepeatPassword(e.target.value)}/>
               </div>
 

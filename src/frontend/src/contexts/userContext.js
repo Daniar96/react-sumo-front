@@ -71,6 +71,9 @@ export const UserDispatchContext = createContext();
 export const useUserState = () => {
   const userState = useContext(UserContext)
   userState.active = userState.token !== null && userState.user !== null
+  const headers = new Headers()
+  headers.append('Authorization', 'Bearer ' + userState.token)
+  userState.authHeaders = headers
   return userState;
 };
 

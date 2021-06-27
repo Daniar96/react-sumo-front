@@ -8,18 +8,10 @@ export const DashboardPage = () => {
   const [simulations, setSimulations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { token } = useUserState()
-  const authParams = {
-    withCredentials: true,
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-    }
-  };
+  const { authHeaders } = useUserState()
 
   useEffect(() => {
-    console.log(token)
-    fetch(`${API_BASE}/simulations`, { method: "GET", ...authParams})
+    fetch(`${API_BASE}/simulations`, { method: "GET", ...authHeaders})
       .then((res) => res.json())
       .then((json) => {
         console.log(json);

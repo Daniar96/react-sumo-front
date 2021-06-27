@@ -9,22 +9,20 @@ export const EditPage = ({ match }) => {
   const [name, setName] = useState({});
   const [description, setDescription] = useState({});
 
-  const { token } = useUserState()
+  const { authHeaders } = useUserState()
 
   function submitForm(e) {
     e.preventDefault();
     fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, {
       method: "PUT",
-      withCredentials: true,
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         name: name,
         description: description,
       }),
+      ...authHeaders
     }).then(() => {
       location.href = `/sim/${match.params.id}`;
     });
