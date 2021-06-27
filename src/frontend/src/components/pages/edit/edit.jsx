@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_BASE } from "../../../util";
 import { Link } from "../../../contexts/routerContext";
+import {useUserState} from "../../../contexts/userContext";
 
 export const EditPage = ({ match }) => {
   const [loading, setLoading] = useState(true);
@@ -8,12 +9,17 @@ export const EditPage = ({ match }) => {
   const [name, setName] = useState({});
   const [description, setDescription] = useState({});
 
+  const { token } = useUserState()
+
   function submitForm(e) {
     e.preventDefault();
     fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, {
       method: "PUT",
+      withCredentials: true,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         name: name,

@@ -27,7 +27,6 @@ const marker_options = {
 export const SimulationPage = ({ match }) => {
   const { token } = useUserState()
   const authParams = {
-      method: "GET",
       withCredentials: true,
       credentials: "include",
       headers: {
@@ -112,15 +111,15 @@ export const SimulationPage = ({ match }) => {
     const [fGraphDynamic, fVehicles, fEdges] = await Promise.all([
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`,
-        authParams
+        { method: "GET", ...authParams}
       ),
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`,
-        authParams
+        { method: "GET", ...authParams}
       ),
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}`,
-        authParams
+      { method: "GET", ...authParams}
       ),
     ]);
 
