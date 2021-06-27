@@ -8,6 +8,7 @@ import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import { Link } from "../../../contexts/routerContext";
 import { API_BASE } from "../../../util.js";
+import {useUserState} from "../../../contexts/userContext";
 
 const map_zoom = 15;
 const map_style = { width: "100%", height: "75vh" };
@@ -24,6 +25,7 @@ const marker_options = {
 };
 
 export const SimulationPage = ({ match }) => {
+  const { token } = useUserState()
   const [_props, setProps] = useState({});
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState({});
@@ -100,13 +102,13 @@ export const SimulationPage = ({ match }) => {
 
     const [fGraphDynamic, fVehicles, fEdges] = await Promise.all([
       await fetch(
-        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`
+        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}&token=${token}`
       ),
       await fetch(
-        `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`
+        `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}&token=${token}`
       ),
       await fetch(
-        `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}`
+        `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}&token=${token}`
       ),
     ]);
 
@@ -207,9 +209,9 @@ export const SimulationPage = ({ match }) => {
     setLoading(true);
 
     const [fMetadata, fNodes, fGraphStatic] = await Promise.all([
-      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata?token=${token}`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes?token=${token}`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static?token=${token}`),
     ]);
 
     setMetadata(await fMetadata.json());
