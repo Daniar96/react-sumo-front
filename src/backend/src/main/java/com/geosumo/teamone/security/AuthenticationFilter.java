@@ -17,32 +17,34 @@ import javax.ws.rs.*;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
+	private static final String AUTHENTICATION_HEADER = "Bearer";
+
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 
 		// Get the Authorization header from the request
 		String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		System.out.println("Request recieved header: " + authorizationHeader);
-
+		
 		// Validate the Authorization header
-		if (!isValidToken(authorizationHeader)) {
-			System.out.println("Header is invalid");
+		if (!isValidHeader(authorizationHeader)) {
 			abortWithUnauthorized(requestContext);
 			return;
 		}
-
+		String token = authorizationHeader.substring(AUTHENTICATION_HEADER.length()).trim();
+		System.out.println("Recieved token: " + token);
 		try {
 			// Validate the token
-			validateToken(authorizationHeader);
+			validateToken(token);
 
 		} catch (Exception e) {
 			abortWithUnauthorized(requestContext);
 		}
 	}
 
-	private boolean isValidToken(String authorizationHeader) {
-		// Check if a header is valid (not null)
-		return authorizationHeader != null;
+	private boolean isValidHeader(String authorizationHeader) {
+		// Check if a header is valid (not null, starts with Bearer)
+		return authorizationHeader != null
+				&& authorizationHeader.toLowerCase().startsWith(AUTHENTICATION_HEADER.toLowerCase() + " ");
 	}
 
 	private void abortWithUnauthorized(ContainerRequestContext requestContext) {
@@ -56,7 +58,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		System.out.println("Validation");
 		TokenList.print();
 		// Throw an Exception if the token is invalid
-		if (token.equals("")) {
+		if (!TokenList.validToken(token)) {
 			throw new Exception();
 		}
 	}

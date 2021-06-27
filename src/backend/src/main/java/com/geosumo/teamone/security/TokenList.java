@@ -5,15 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class TokenList {
 	private static ReentrantLock lock = new ReentrantLock();
-
 	volatile static ArrayList<String> tokens = new ArrayList<String>();
-
-	public static void addToken(byte[] token) {
-		lock.lock();
-		System.out.println("Adding token");
-		tokens.add(new String(token));
-		lock.unlock();
-	}
 
 	public static void addToken(String token) {
 		lock.lock();
@@ -22,12 +14,13 @@ public class TokenList {
 		lock.unlock();
 	}
 
-	public static boolean validToken(byte[] token) {
+	public static boolean validToken(String token) {
 		try {
 			lock.lock();
 			if (tokens.isEmpty())
 				return false;
-			return true;
+			return tokens.contains(token);
+
 		} finally {
 			lock.unlock();
 		}

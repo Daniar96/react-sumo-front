@@ -35,7 +35,7 @@ public class SimulationsResource {
 		return new SimulationResource(uriInfo, request, id);
 	}
 
-	
+	@SecurityCheck
 	@POST
 	@Consumes("application/zip")
 	public void uploadSimulation(@QueryParam("name") String name, @QueryParam("description") String description,
