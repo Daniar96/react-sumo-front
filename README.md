@@ -52,3 +52,8 @@ environment.
 The backend is located in `src/backend`.
 
 For the backend, boot up your favorite Java IDE and perform the normal sequence of actions in order to boot up a Java servlet application.
+
+### Links
+
+Trello: <https://trello.com/b/sd8qOHBi/2021-m4-project-centrogeo-sumo-team-17>
+Production Server: <https://centrogeo-sumo.paas.hosted-by-previder.com>
