@@ -26,6 +26,14 @@ const marker_options = {
 
 export const SimulationPage = ({ match }) => {
   const { token } = useUserState()
+  const authParams = {
+      method: "GET",
+      withCredentials: true,
+      credentials: "include",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      }
+    };
   const [_props, setProps] = useState({});
   const [loading, setLoading] = useState(true);
   const [metadata, setMetadata] = useState({});
@@ -91,6 +99,7 @@ export const SimulationPage = ({ match }) => {
     if (confirm("Are you sure you want to delete this simulation?")) {
       fetch(`${API_BASE}/simulations/${match.params.id}`, {
         method: "DELETE",
+        ...authParams
       }).then(() => {
         window.location.href = "/dashboard";
       });
@@ -102,13 +111,16 @@ export const SimulationPage = ({ match }) => {
 
     const [fGraphDynamic, fVehicles, fEdges] = await Promise.all([
       await fetch(
-        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}&token=${token}`
+        `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`,
+        authParams
       ),
       await fetch(
-        `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}&token=${token}`
+        `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`,
+        authParams
       ),
       await fetch(
-        `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}&token=${token}`
+        `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}`,
+        authParams
       ),
     ]);
 
@@ -209,9 +221,9 @@ export const SimulationPage = ({ match }) => {
     setLoading(true);
 
     const [fMetadata, fNodes, fGraphStatic] = await Promise.all([
-      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata?token=${token}`),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes?token=${token}`),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static?token=${token}`),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, authParams),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`, authParams),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`, authParams),
     ]);
 
     setMetadata(await fMetadata.json());
