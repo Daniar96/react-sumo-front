@@ -1,6 +1,7 @@
 import { API_BASE } from "../../../util";
 import { Link } from "../../../contexts/routerContext";
 import { useState } from "react";
+import {useUserState} from "../../../contexts/userContext";
 
 export const UploadPage = () => {
   const [uploading, setUploading] = useState(false);
@@ -8,6 +9,8 @@ export const UploadPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]);
+
+  const { token } = useUserState()
 
   function upload() {
     setUploading(true);
@@ -21,6 +24,9 @@ export const UploadPage = () => {
         name
       )}&description=${encodeURIComponent(description)}`
     );
+
+    xhr.withCredentials = true;
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
