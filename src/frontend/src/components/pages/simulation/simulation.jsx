@@ -91,7 +91,7 @@ export const SimulationPage = ({ match }) => {
     if (confirm("Are you sure you want to delete this simulation?")) {
       fetch(`${API_BASE}/simulations/${match.params.id}`, {
         method: "DELETE",
-        ...authHeaders
+        headers: authHeaders
       }).then(() => {
         window.location.href = "/dashboard";
       });
@@ -104,15 +104,15 @@ export const SimulationPage = ({ match }) => {
     const [fGraphDynamic, fVehicles, fEdges] = await Promise.all([
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/graphs/dynamic?timestep=${timestep}`,
-        { method: "GET", ...authHeaders}
+        { method: "GET", headers: authHeaders}
       ),
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/vehicles?from=${timestep}&to=${timestep}`,
-        { method: "GET", ...authHeaders}
+        { method: "GET", headers: authHeaders}
       ),
       await fetch(
         `${API_BASE}/simulations/${match.params.id}/edges?timestep=${timestep}`,
-      { method: "GET", ...authHeaders}
+      { method: "GET", headers: authHeaders}
       ),
     ]);
 
@@ -213,9 +213,9 @@ export const SimulationPage = ({ match }) => {
     setLoading(true);
 
     const [fMetadata, fNodes, fGraphStatic] = await Promise.all([
-      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, authHeaders),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`, authHeaders),
-      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`, authHeaders),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, { method: "GET", headers: authHeaders}),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/nodes`, { method: "GET", headers: authHeaders}),
+      await fetch(`${API_BASE}/simulations/${match.params.id}/graphs/static`, { method: "GET", headers: authHeaders}),
     ]);
 
     setMetadata(await fMetadata.json());

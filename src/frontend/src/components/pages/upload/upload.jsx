@@ -3,7 +3,7 @@ import { Link } from "../../../contexts/routerContext";
 import { useState } from "react";
 import {useUserState} from "../../../contexts/userContext";
 
-export const UploadPage = () => {
+export const UploadPage = (props) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0.0);
   const [name, setName] = useState("");
@@ -33,6 +33,10 @@ export const UploadPage = () => {
         setProgress(e.loaded / e.total);
       }
     };
+
+    xhr.upload.onloadend = () => {
+      props.history.push('/dashboard')
+    }
 
     xhr.send(files[0]);
   }

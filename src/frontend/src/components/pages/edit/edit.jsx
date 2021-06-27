@@ -10,14 +10,13 @@ export const EditPage = ({ match }) => {
   const [description, setDescription] = useState({});
 
   const { authHeaders } = useUserState()
+  authHeaders.append("Content-Type", "application/json")
 
   function submitForm(e) {
     e.preventDefault();
     fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: authHeaders,
       body: JSON.stringify({
         name: name,
         description: description,

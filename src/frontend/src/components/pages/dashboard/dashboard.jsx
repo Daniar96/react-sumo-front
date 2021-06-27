@@ -11,7 +11,7 @@ export const DashboardPage = () => {
   const { authHeaders } = useUserState()
 
   useEffect(() => {
-    fetch(`${API_BASE}/simulations`, { method: "GET", ...authHeaders})
+    fetch(`${API_BASE}/simulations`, { method: "GET", headers: authHeaders})
       .then((res) => res.json())
       .then((json) => {
         console.log(json);
