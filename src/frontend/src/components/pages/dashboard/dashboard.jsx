@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link } from "../../../contexts/routerContext";
 import { API_BASE } from "../../../util";
+import { useUserState } from '../../../contexts/userContext'
 
 export const DashboardPage = () => {
   const [search, setSearch] = useState("");
   const [simulations, setSimulations] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const { token } = useUserState()
+  const authParams = {
+    withCredentials: true,
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    }
+  };
+
   useEffect(() => {
-    fetch(`${API_BASE}/simulations`)
+    console.log(token)
+    fetch(`${API_BASE}/simulations`, { method: "GET", ...authParams})
       .then((res) => res.json())
       .then((json) => {
         console.log(json);
