@@ -37,6 +37,16 @@ yarn link react-sylvereye
 yarn build
 ```
 
+The contents of the resulting `build` folder can then be copied over to
+`src/backend/src/main/webapp` to be served by the backend
+
+#### Environment variables
+
+`.env.development` contains variables for running the fronend as a standalone
+application for debugging and development purposes.
+`.env.production` contains variables to properly function in a production
+environment.
+
 ### Backend
 
 The backend is located in `src/backend`.
