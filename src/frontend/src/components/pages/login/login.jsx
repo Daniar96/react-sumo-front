@@ -70,13 +70,13 @@ export const LoginPage = (props) => {
             <form>
               <div className="mb-3">
                 <label htmlFor="login" className="form-label">Email address</label>
-                <input type="email" className="form-control" id="login" value={username}
+                <input autoComplete="off" type="email" className="form-control" id="login" value={username}
                        onChange={e => setUsername(e.target.value)}/>
 
               </div>
               <div className="mb-3">
                 <label htmlFor="logPassword" className="form-label">Password</label>
-                <input type="password" className="form-control" id="logPassword" value={password}
+                <input autoComplete="off" type="password" className="form-control" id="logPassword" value={password}
                        onChange={e => setPassword(e.target.value)}/>
               </div>
               <div className="form-text"><a href="#">Forgot password?</a></div>
