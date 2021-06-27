@@ -7,6 +7,7 @@ import javax.ws.rs.core.*;
 import com.geosumo.teamone.dao.SimulationDao;
 import com.geosumo.teamone.models.ServerError;
 import com.geosumo.teamone.models.UserCredentials;
+import com.geosumo.teamone.security.TokenList;
 import com.geosumo.teamone.security.UsernameWithToken;
 
 @Path("/login")
@@ -27,6 +28,7 @@ public class LoginResource {
 						.build();
 			} else {
 				UsernameWithToken ut = new UsernameWithToken(input.getUsername());
+				TokenList.addToken(ut.getToken());
 				return Response.status(Response.Status.OK).entity(ut).build();
 			}
 		} catch (SQLException e) {

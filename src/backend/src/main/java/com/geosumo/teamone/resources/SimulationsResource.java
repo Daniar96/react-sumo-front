@@ -1,6 +1,7 @@
 package com.geosumo.teamone.resources;
 
 import com.geosumo.teamone.dao.SimulationDao;
+import com.geosumo.teamone.security.SecurityCheck;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -19,17 +20,20 @@ public class SimulationsResource {
 	@Context
 	private Request request;
 
+	@SecurityCheck
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getSimulations() throws SQLException {
 		return SimulationDao.INSTANCE.getListJson();
 	}
 
+	@SecurityCheck
 	@Path("{simulation_id}")
 	public SimulationResource getSimulation(@PathParam("simulation_id") int id) {
 		return new SimulationResource(uriInfo, request, id);
 	}
 
+	@SecurityCheck
 	@POST
 	@Consumes("application/zip")
 	public void uploadSimulation(@QueryParam("name") String name, @QueryParam("description") String description,
