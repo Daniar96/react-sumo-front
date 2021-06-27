@@ -24,16 +24,18 @@ public class SimulationsResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getSimulations() throws SQLException {
+		System.out.println("Request getSimulations");
 		return SimulationDao.INSTANCE.getListJson();
 	}
 
 	@SecurityCheck
 	@Path("{simulation_id}")
 	public SimulationResource getSimulation(@PathParam("simulation_id") int id) {
+		System.out.println("Request getSimulation");
 		return new SimulationResource(uriInfo, request, id);
 	}
 
-	@SecurityCheck
+	
 	@POST
 	@Consumes("application/zip")
 	public void uploadSimulation(@QueryParam("name") String name, @QueryParam("description") String description,

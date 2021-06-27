@@ -1,8 +1,5 @@
 package com.geosumo.teamone.models;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-
 public class ServerError {
 	private String error;
 
