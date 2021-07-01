@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_BASE } from "../../../util";
 import { Link } from "../../../contexts/routerContext";
-import {useUserState} from "../../../contexts/userContext";
+import { useUserState } from "../../../contexts/userContext";
 
 export const EditPage = ({ match }) => {
   const [loading, setLoading] = useState(true);
@@ -9,8 +9,8 @@ export const EditPage = ({ match }) => {
   const [name, setName] = useState({});
   const [description, setDescription] = useState({});
 
-  const { authHeaders } = useUserState()
-  authHeaders.append("Content-Type", "application/json")
+  const { authHeaders } = useUserState();
+  authHeaders.append("Content-Type", "application/json");
 
   function submitForm(e) {
     e.preventDefault();
@@ -21,7 +21,6 @@ export const EditPage = ({ match }) => {
         name: name,
         description: description,
       }),
-      ...authHeaders
     }).then(() => {
       location.href = `/sim/${match.params.id}`;
     });
@@ -31,7 +30,9 @@ export const EditPage = ({ match }) => {
     setLoading(true);
 
     const metadata = await (
-      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`)
+      await fetch(`${API_BASE}/simulations/${match.params.id}/metadata`, {
+        headers: authHeaders,
+      })
     ).json();
 
     setMetadata(metadata);
